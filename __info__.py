@@ -43,7 +43,7 @@ def __package_name__():
 
 
 def __files__():
-	return ['message_client.py', 'message_connection.py', 'message_router.py', 'message_server.py', 'util.py'] 
+	return ['client.py', 'connection.py', 'router.py', 'server.py', 'util.py']
 
 
 def __setup_py__():

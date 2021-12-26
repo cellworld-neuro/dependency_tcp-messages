@@ -1,8 +1,8 @@
 import socket
 from .message import Message
 from .message_list import MessageList
-from .message_connection import MessageConnection
-from .message_router import MessageRouter
+from .connection import MessageConnection
+from .router import MessageRouter
 
 
 class MessageClient:

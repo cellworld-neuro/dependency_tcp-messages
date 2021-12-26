@@ -1,7 +1,7 @@
 import socket
 from threading import Thread
-from .message_connection import MessageConnection
-from .message_router import MessageRouter
+from .connection import MessageConnection
+from .router import MessageRouter
 
 
 class MessageServer:

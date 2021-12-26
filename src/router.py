@@ -1,7 +1,7 @@
 from threading import Thread, Lock
 import types
 from .message import Message
-from .message_connection import MessageConnection
+from .connection import MessageConnection
 from .util import check_type
 import re
 
