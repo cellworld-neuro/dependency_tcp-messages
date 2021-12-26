@@ -1,16 +1,16 @@
 import socket
 from .message import Message
 from .message_list import MessageList
-from .connection import MessageConnection
-from .router import MessageRouter
+from .connection import Connection
+from .router import Router
 
 
-class MessageClient:
+class Client:
     def __init__(self):
         self.failed_messages = None
         self.running = False
         self.registered = False
-        self.router = MessageRouter()
+        self.router = Router()
         self.router.unrouted_message = self.__unrouted__
         self.ip = ""
         self.port = 0
@@ -25,7 +25,7 @@ class MessageClient:
         self.port = port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((self.ip, self.port))
-        self.connection = MessageConnection(s, self.failed_messages)
+        self.connection = Connection(s, self.failed_messages)
         self.router.attend(self.connection)
 
     def disconnect(self):

@@ -1,14 +1,14 @@
 import socket
 from threading import Thread
-from .connection import MessageConnection
-from .router import MessageRouter
+from .connection import Connection
+from .router import Router
 
 
-class MessageServer:
+class Server:
 
     def __init__(self, ip="0.0.0.0"):
         self.failed_messages = None
-        self.router = MessageRouter()
+        self.router = Router()
         self.connections = []
         self.thread = None
         self.server = socket.socket()
@@ -39,7 +39,7 @@ class MessageServer:
             try:
                 client, address = self.server.accept()
                 if client:
-                    client_connection = MessageConnection(client, self.failed_messages)
+                    client_connection = Connection(client, self.failed_messages)
                     self.connections.append(client_connection)
                     self.router.attend(client_connection)
 

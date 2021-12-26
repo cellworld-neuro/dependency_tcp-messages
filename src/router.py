@@ -1,12 +1,12 @@
 from threading import Thread, Lock
 import types
 from .message import Message
-from .connection import MessageConnection
+from .connection import Connection
 from .util import check_type
 import re
 
 
-class MessageRouter:
+class Router:
     def __init__(self):
         self.routes = {}
         self.failed_message = None
@@ -36,7 +36,7 @@ class MessageRouter:
                 self.unrouted_message(message)
         return responses
 
-    def attend(self, connection: MessageConnection):
+    def attend(self, connection: Connection):
         RouterProcess.attend(connection, self)
 
 
@@ -45,7 +45,7 @@ class RouterProcess:
     __mutex = Lock()
 
     @staticmethod
-    def attend(connection: MessageConnection, router: MessageRouter):
+    def attend(connection: Connection, router: Router):
         RouterProcess.__mutex.acquire()
         if RouterProcess.__handler is None:
             RouterProcess.__handler = RouterProcess()
@@ -70,7 +70,7 @@ class RouterProcess:
             clean_up_required = []
             for index, (connection, router) in enumerate(self.connections):
                 try:
-                    if connection.state == MessageConnection.State.Open:
+                    if connection.state == Connection.State.Open:
                         message = connection.receive()
                         if message:
                             responses = router.route(message)

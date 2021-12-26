@@ -4,7 +4,7 @@ from .message import Message
 import socket
 
 
-class MessageConnection:
+class Connection:
 
     class State:
         Open = 1
@@ -21,7 +21,7 @@ class MessageConnection:
 
     def close(self):
         self.socket.close()
-        self.state = MessageConnection.State.Close
+        self.state = Connection.State.Close
 
     def send(self, message):
         check_type(message, Message, "incorrect type for message")
@@ -34,16 +34,16 @@ class MessageConnection:
         try:
             data = self.socket.recv(1, socket.MSG_PEEK)
         except socket.timeout:
-            self.state = MessageConnection.State.Open
+            self.state = Connection.State.Open
             return False
         except:
-            self.state = MessageConnection.State.Close
+            self.state = Connection.State.Close
             return False
-        self.state = MessageConnection.State.Open
+        self.state = Connection.State.Open
         return True
 
     def receive(self):
-        if not self.state == MessageConnection.State.Open: #if the connection is not open
+        if not self.state == Connection.State.Open: #if the connection is not open
             return
         if self.pending_messages:
             return self.pending_messages.dequeue() #if there are pending messages retrun the oldest
@@ -55,7 +55,7 @@ class MessageConnection:
         except socket.timeout as e:
             pass
         except Exception as e:
-            self.state = MessageConnection.State.Close #if connection was closed from the other side
+            self.state = Connection.State.Close #if connection was closed from the other side
         else:
             if data:
                 messages_str = data.decode().split('\x00')
