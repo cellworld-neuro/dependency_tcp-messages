@@ -1,9 +1,11 @@
-from enum import Enum
-from .util import check_type, Message, Message_list, Json_get
+from .util import check_type
+from .message_list import MessageList
+from .message import Message
 import socket
 
 
-class Message_connection:
+class MessageConnection:
+
     class State:
         Open = 1
         Close = 4
@@ -13,13 +15,13 @@ class Message_connection:
         self.socket = s
         self.socket.settimeout(0.001)
         self.failed_message = failed_message
-        self.pending_messages = Message_list()
+        self.pending_messages = MessageList()
         self.state = None
         self.peek()
 
     def close(self):
         self.socket.close()
-        self.state = Message_connection.State.Close
+        self.state = MessageConnection.State.Close
 
     def send(self, message):
         check_type(message, Message, "incorrect type for message")
@@ -32,16 +34,16 @@ class Message_connection:
         try:
             data = self.socket.recv(1, socket.MSG_PEEK)
         except socket.timeout:
-            self.state = Message_connection.State.Open
+            self.state = MessageConnection.State.Open
             return False
         except:
-            self.state = Message_connection.State.Close
+            self.state = MessageConnection.State.Close
             return False
-        self.state = Message_connection.State.Open
+        self.state = MessageConnection.State.Open
         return True
 
     def receive(self):
-        if not self.state == Message_connection.State.Open: #if the connection is not open
+        if not self.state == MessageConnection.State.Open: #if the connection is not open
             return
         if self.pending_messages:
             return self.pending_messages.dequeue() #if there are pending messages retrun the oldest
@@ -53,18 +55,17 @@ class Message_connection:
         except socket.timeout as e:
             pass
         except Exception as e:
-            self.state = Message_connection.State.Close #if connection was closed from the other side
+            self.state = MessageConnection.State.Close #if connection was closed from the other side
         else:
             if data:
                 messages_str = data.decode().split('\x00')
                 for message_str in messages_str:
                     if message_str:
                         try:
-                            message = Json_get(message_str, Message)
+                            message = Message.parse(message_str) # creates a new message instance
                             self.pending_messages.queue(message)
                         except:
                             if self.failed_message:
                                 self.failed_message(message_str)
         return self.pending_messages.dequeue()
-
 
