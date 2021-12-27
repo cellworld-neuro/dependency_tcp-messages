@@ -30,3 +30,6 @@ class Client:
 
     def disconnect(self):
         self.running = False
+
+    def __del__(self):
+        self.disconnect()

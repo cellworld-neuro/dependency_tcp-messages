@@ -39,8 +39,12 @@ class Connection:
         except:
             self.state = Connection.State.Close
             return False
-        self.state = Connection.State.Open
-        return True
+        if len(data) == 0:
+            self.state = Connection.State.Close
+            return False
+        else:
+            self.state = Connection.State.Open
+            return True
 
     def receive(self):
         if not self.state == Connection.State.Open: #if the connection is not open
@@ -69,3 +73,6 @@ class Connection:
                                 self.failed_message(message_str)
         return self.pending_messages.dequeue()
 
+    def __bool__(self):
+        self.peek()
+        return self.state == Connection.State.Open

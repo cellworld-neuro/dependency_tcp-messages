@@ -12,6 +12,7 @@ class Router:
         self.failed_message = None
         self.failed_route = None
         self.unrouted_message = None
+        self.routing_count = 0
 
     def add_route(self, pattern: str, handler, body_type=None):
         check_type(handler, (types.FunctionType, types.MethodType), "incorrect type for handler")
@@ -34,6 +35,7 @@ class Router:
         if not responses:
             if self.unrouted_message:
                 self.unrouted_message(message)
+        self.routing_count += 1
         return responses
 
     def attend(self, connection: Connection):
@@ -73,6 +75,7 @@ class RouterProcess:
                     if connection.state == Connection.State.Open:
                         message = connection.receive()
                         if message:
+                            message._source = connection
                             responses = router.route(message)
                             if responses:
                                 for response in responses:

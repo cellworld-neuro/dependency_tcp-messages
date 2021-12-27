@@ -18,13 +18,13 @@ class MessageList(JsonList):
             return message
         return None
 
-    def contains(self, header):
+    def contains(self, header: str) -> bool:
         for message in self:
             if message.header == header:
                 return True
         return False
 
-    def get_message(self, header):
+    def get_message(self, header: str) -> Message:
         for i in range(len(self)):
             if self[i].header == header:
                 message = self[i]
@@ -32,7 +32,7 @@ class MessageList(JsonList):
                 return message
         return None
 
-    def get_last_message(self, header):
+    def get_last_message(self, header: str) -> Message:
         message = None
         for i in range(len(self)):
             if self[i].header == header:
