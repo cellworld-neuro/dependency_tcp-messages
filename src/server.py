@@ -61,3 +61,12 @@ class Server:
 
     def __del__(self):
         self.stop()
+
+    def __bool__(self):
+        if self.running:
+            return True
+        else:
+            try:
+                self.thread.join()
+            finally:
+                return False

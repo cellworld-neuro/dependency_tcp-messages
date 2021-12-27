@@ -11,7 +11,7 @@ class MessageList(JsonList):
         check_type(message, Message, "wrong type for message")
         self.append(message)
 
-    def dequeue(self):
+    def dequeue(self) -> Message:
         if len(self):
             message = self[0]
             del self[0]

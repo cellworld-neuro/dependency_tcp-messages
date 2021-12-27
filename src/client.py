@@ -33,3 +33,6 @@ class Client:
 
     def __del__(self):
         self.disconnect()
+
+    def __bool__(self):
+        return self.connection == True

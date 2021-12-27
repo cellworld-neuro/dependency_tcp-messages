@@ -60,6 +60,7 @@ A route handler is any callable object (function, lambda, etc.). If the handler 
 - JsonObject or JsonList: if the response is a JsonObject (https://github.com/germanespinosa/json-cpp) the value will be serialized and will be recovered in the other end.
 - Message response: you can return a custom message with your own header and body
 
+Message routing is possible in both, server and client. 
 example:
 ####server.py
 ```
@@ -80,7 +81,7 @@ print("server is running")
 server.join()
 
 ```
-###client.py
+####client.py
 ```
 from tcp_messages import Client, Message
 from json_cpp import JsonObject, JsonList
@@ -104,3 +105,7 @@ while client.connection:
     pass
 ```
 
+###Message queue
+Another way to communicate process is by using message queues. Unrouted messages get queued in the "messages" structure to be consumed later.
+
+Using the previous

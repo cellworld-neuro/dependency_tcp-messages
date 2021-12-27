@@ -4,14 +4,23 @@ from random import randint, random, choice
 import string
 
 server = Server()
-server.router.add_route("int_value", lambda m: randint(0, 100))
-server.router.add_route("float_value", lambda m: random())
-server.router.add_route("string_value", lambda m: ''.join(choice(string.ascii_lowercase) for i in range(10)))
-server.router.add_route("JsonObject_value", lambda m: JsonObject(v0=randint(0, 100), v1=random(), v2=JsonObject(v3="string value")))
-server.router.add_route("JsonList_value", lambda m: JsonList(iterable=["1", 2, JsonObject(a=2), 4]))
-server.router.add_route("stop", lambda m: server.stop())
 server.start(port=6500) #service starts listening on port 6500
 print("server is running")
+while server:
+    m = server.messages.dequeue()
+    if m:
+        if m.header == "int_value":
+            m.reply(Message("int_value_response", randint(0, 100)))
+        elif m.header == "float_value":
+            m.reply(Message("float_value_response", random()))
+        elif m.header == "string_value":
+            m.reply(Message("string_value_response", ''.join(choice(string.ascii_lowercase) for i in range(10))))
+        elif m.header == "JsonObject_value":
+            m.reply(Message("JsonObject_value_response", JsonObject(v0=randint(0, 100), v1=random(), v2=JsonObject(v3="string value"))))
+        elif m.header == "JsonList_value":
+            m.reply(Message("JsonList_value_response", JsonList(iterable=["1", 2, JsonObject(a=2), 4])))
+        elif m.header == "stop":
+            server.stop()
 server.join()
 
 
