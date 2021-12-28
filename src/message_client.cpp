@@ -1,5 +1,4 @@
 #include <tcp_messages/message_client.h>
-#include <cell_world/core.h>
 #include <stdexcept>
 
 using namespace std;
