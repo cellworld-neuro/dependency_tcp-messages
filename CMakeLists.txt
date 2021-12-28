@@ -58,3 +58,23 @@ target_link_libraries(tcp_messages
 
 #install_dependency(https://github.com/germanespinosa/catch CatchTests)
 #test_library(tcp_messages)
+
+
+###
+### LIBRARY INSTALLATION
+###
+
+include(GNUInstallDirs)
+
+install(TARGETS tcp_messages EXPORT Tcp_messagesConfig
+        ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT Tcp_messagesConfig
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake/Tcp_messages
+        EXPORT_LINK_INTERFACE_LIBRARIES)
+
+export(TARGETS tcp_messages FILE Tcp_messagesConfig.cmake)
