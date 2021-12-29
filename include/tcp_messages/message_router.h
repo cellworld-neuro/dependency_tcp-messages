@@ -15,4 +15,4 @@
     }                                                                     \
 }
 
-#define Routes(ADD_ROUTES) bool route(const cell_world::Message &message) override { bool routed = false; ADD_ROUTES; return routed; }
+#define Routes(ADD_ROUTES) bool route(const tcp_messages::Message &message) override { bool routed = false; ADD_ROUTES; return routed; }
