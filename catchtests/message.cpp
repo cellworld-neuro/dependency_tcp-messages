@@ -41,3 +41,8 @@ TEST_CASE("test_service") {
     cout << "stopping server" << endl;
     t.join();
 }
+
+
+TEST_CASE("test_message") {
+    cout << Message("hello","hola!") << endl;
+}

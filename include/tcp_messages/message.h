@@ -21,10 +21,12 @@ namespace tcp_messages {
             return x;
         }
         template <class T>
-        void set_body(const T &body){
+        void set_body(const T body){
             if constexpr (std::is_same_v<T, std::string>) {
                 this->body = body;
             } else if constexpr (std::is_same_v<T, char *>) {
+                this->body = std::string(body);
+            } else if constexpr (std::is_same_v<T, const char *>) {
                 this->body = std::string(body);
             } else if constexpr (std::is_base_of<json_cpp::Json_base ,T>::value) {
                 this->body = body.to_json();
