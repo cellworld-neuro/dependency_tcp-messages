@@ -2,6 +2,8 @@
 #include <json_cpp.h>
 
 namespace tcp_messages {
+    std::string get_response_header(const std::string &request_header);
+
     struct Message : json_cpp::Json_object {
         Message () = default;
         Message (const std::string &header);
@@ -30,6 +32,8 @@ namespace tcp_messages {
                 this->body = std::string(body);
             } else if constexpr (std::is_base_of<json_cpp::Json_base ,T>::value) {
                 this->body = body.to_json();
+            } else {
+                this->body = std::to_string(body);
             }
         }
         Json_object_members({

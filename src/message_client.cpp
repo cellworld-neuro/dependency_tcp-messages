@@ -1,5 +1,6 @@
 #include <tcp_messages/message_client.h>
 #include <stdexcept>
+#include <chrono>
 
 using namespace std;
 
@@ -7,6 +8,23 @@ namespace tcp_messages{
 
     bool Message_client::send_message(const Message &message) {
         return send_data(message.to_json());
+    }
+
+    Message Message_client::send_request(const Message &request, int time_out) {
+        if (!send_message(request)) throw "failed to send the request to server.";
+        auto check_point = std::chrono::high_resolution_clock::now();
+        auto time_stamp = std::chrono::high_resolution_clock::now();
+        auto ms = std::chrono::duration<double, std::milli>(time_stamp - check_point).count();
+        auto response_header = get_response_header(request.header);
+        while (!contains(response_header) && (ms < time_out || time_out == 0)){
+            time_stamp = std::chrono::high_resolution_clock::now();
+            ms = std::chrono::duration<double, std::milli>(time_stamp - check_point).count();
+        }
+        if (contains(response_header)) {
+            return get_message(response_header);
+        } else {
+            throw "request timed out";
+        }
     }
 
     void Message_client::received_data(const std::string &data) {

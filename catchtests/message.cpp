@@ -17,10 +17,16 @@ TEST_CASE("get_response") {
 
 struct Test_service : Message_service {
     Routes(
-            Add_route_with_response("H1",h1, int);
+            Add_route_with_response("H1", h1, int);
+            Add_route_with_response("H2", h2, int);
+            Add_route_with_response("H3", h3, int);
+            Add_route_with_response("H4", h4, int);
             Add_route("stop", stop);
             )
     int h1(int i) { return i+1; }
+    string h2(int i) { return to_string(i+1); }
+    bool h3(int i) { return i % 2; }
+    Message h4(int i) { return Message("H4_response",i+1); }
 };
 
 using namespace std::chrono_literals;
@@ -35,6 +41,10 @@ TEST_CASE("test_service") {
         cout << "message wait ends" << endl;
         Message_client c;
         c.connect("127.0.0.1", 6500);
+        cout << c.send_request(Message("H1",100)) << endl;
+        cout << c.send_request(Message("H2",100)) << endl;
+        cout << c.send_request(Message("H3",100)) << endl;
+        cout << c.send_request(Message("H4",100)) << endl;
         c.send_message(Message("stop"));
     });
     s.join();

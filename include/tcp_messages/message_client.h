@@ -12,6 +12,7 @@ namespace tcp_messages {
         virtual void failed_message(const std::string &);
         bool contains(const std::string &header);
         bool send_message(const Message &);
+        Message send_request(const Message &request, int time_out = 500);
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
         std::deque<Message> messages;

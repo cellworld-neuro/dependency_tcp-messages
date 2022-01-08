@@ -8,7 +8,8 @@
     if (std::regex_match (message.header,std::regex(HEADER))) {           \
         routed = true;                                                    \
         try {                                                             \
-                DESTINATION(__VA_OPT__(message.get_body<__VA_ARGS__>())); \
+                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)\
+                DESTINATION(__VA_OPT__(request));                         \
         } catch (...) {                                                   \
             failed_route(message);                                        \
         }                                                                 \
@@ -22,19 +23,15 @@ namespace tcp_messages {
             return response;
         }
         Message response_message;
-        response_message.header = request_header + "_response";
-        if constexpr (std::is_base_of<json_cpp::Json_base, T>::value) {
-            response_message.body = response.to_json();
-        } else if constexpr (std::is_same_v<char *, T> || std::is_same_v<const char *, T>) {
-            response_message.body = response;
-        } else if constexpr (std::is_same_v<bool, T> || std::is_same_v<const bool, T>) {
+        response_message.header = get_response_header(request_header);
+        if constexpr (std::is_same_v<bool, T> || std::is_same_v<const bool, T>) {
             if (response) {
                 response_message.body = "success";
             } else {
                 response_message.body = "fail";
             }
         } else {
-            response_message.body = std::to_string(response);
+            response_message.set_body(response);
         }
         return response_message;
     }
@@ -44,7 +41,8 @@ namespace tcp_messages {
     if (std::regex_match (message.header,std::regex(HEADER))) {           \
         routed = true;                                                    \
         try {                                                             \
-                auto response = DESTINATION(__VA_OPT__(message.get_body<__VA_ARGS__>())); \
+                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)\
+                auto response = DESTINATION(__VA_OPT__(request)); \
                 send_message(tcp_messages::get_response(message.header, response));         \
         } catch (...) {                                                   \
             failed_route(message);                                        \
