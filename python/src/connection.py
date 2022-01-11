@@ -23,7 +23,7 @@ class Connection:
         self.socket.close()
         self.state = Connection.State.Close
 
-    def send(self, message):
+    def send(self, message: Message) -> bool:
         check_type(message, Message, "incorrect type for message")
         message_str = str(message)
         message_bytes = message_str.encode()

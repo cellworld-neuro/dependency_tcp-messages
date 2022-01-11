@@ -11,4 +11,9 @@ namespace tcp_messages {
 
     }
 
+    void Manifest::add_route(const std::string &route, const std::string &input_type) {
+        auto &new_route = emplace_back();
+        new_route.input_type = input_type;
+        new_route.route = route;
+    }
 }

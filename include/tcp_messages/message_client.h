@@ -13,6 +13,7 @@ namespace tcp_messages {
         bool contains(const std::string &header);
         bool send_message(const Message &);
         Message send_request(const Message &request, int time_out = 500);
+        Manifest get_manifest();
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
         std::deque<Message> messages;

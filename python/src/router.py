@@ -4,7 +4,7 @@ from .message import Message
 from .connection import Connection
 from .util import check_type
 import re
-
+from json_cpp import JsonList, JsonObject
 
 class Router:
     def __init__(self):
@@ -18,9 +18,18 @@ class Router:
         check_type(handler, (types.FunctionType, types.MethodType), "incorrect type for handler")
         self.routes[pattern] = (handler, body_type)
 
+    def get_manifest(self):
+        manifest = JsonList()
+        for pattern in self.routes.keys():
+            (handler, body_type) = self.routes[pattern]
+            manifest.append(JsonObject(route=pattern, input_type=body_type))
+        return manifest
+
     def route(self, message: Message):
         responses = []
         check_type(message, Message, "incorrect type for message")
+        if message.header == "!manifest":
+            responses.append(self.get_manifest())
         for pattern in self.routes.keys():
             if re.search(pattern, message.header):
                 (handler, body_type) = self.routes[pattern]

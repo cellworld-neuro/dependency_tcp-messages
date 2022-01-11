@@ -4,7 +4,8 @@
 #include <tcp_messages/message.h>
 #include <regex>
 
-#define Add_route(HEADER, DESTINATION, ...) {                             \
+#define Add_route(HEADER, DESTINATION, ...) { \
+    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                       \
     if (std::regex_match (message.header,std::regex(HEADER))) {           \
         routed = true;                                                    \
         try {                                                             \
@@ -37,7 +38,8 @@ namespace tcp_messages {
     }
 }
 
-#define Add_route_with_response(HEADER, DESTINATION, ...) {               \
+#define Add_route_with_response(HEADER, DESTINATION, ...) { \
+    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                       \
     if (std::regex_match (message.header,std::regex(HEADER))) {           \
         routed = true;                                                    \
         try {                                                             \
@@ -51,4 +53,10 @@ namespace tcp_messages {
 }
 
 
-#define Routes(ADD_ROUTES) bool route(const tcp_messages::Message &message) override { bool routed = false; ADD_ROUTES; return routed; }
+#define Routes(ADD_ROUTES) bool route(const tcp_messages::Message &message) override { \
+    tcp_messages::Manifest manifest;                                                   \
+    bool routed = false;                                                               \
+    ADD_ROUTES;                                                                        \
+    Add_route_with_response("!manifest", [manifest](){return manifest;});              \
+    return routed;                                                                     \
+}

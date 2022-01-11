@@ -77,4 +77,8 @@ namespace tcp_messages{
     void Message_client::failed_route(const Message &) {
 
     }
+
+    Manifest Message_client::get_manifest() {
+        return send_request(Message("!manifest")).get_body<Manifest>();
+    }
 }

@@ -13,6 +13,15 @@ TEST_CASE("get_response") {
     cout << get_response("h1", Message("hola","1")) << endl;
     cout << get_response("h1", true) << endl;
 }
+//
+//struct test_data :json_cpp::Json_object{
+//    Json_object_members(
+//        Add_member(d1);
+//            Add_member(d2)
+//    )
+//    std::string d1;
+//    std::string d2;
+//};
 
 
 struct Test_service : Message_service {
@@ -45,6 +54,7 @@ TEST_CASE("test_service") {
         cout << c.send_request(Message("H2",100)) << endl;
         cout << c.send_request(Message("H3",100)) << endl;
         cout << c.send_request(Message("H4",100)) << endl;
+        cout << c.send_request(Message("!manifest",100)).get_body<Manifest>() << endl;
         c.send_message(Message("stop"));
     });
     s.join();
