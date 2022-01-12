@@ -25,8 +25,8 @@ In this example two routes are defined for headers "greeting" and "stop".
 
 ####server.py:
 ```
-from tcp_messages import Server
-server = Server()
+from tcp_messages import MessageServer
+server = MessageServer()
 server.router.add_route("greeting", lambda message: message.body + " to you too!")
 server.router.add_route("stop", lambda message: server.stop())
 server.start(port=6500) #service starts listening on port 6500
@@ -38,8 +38,8 @@ Then it checks until it receives a response from the server and prints the body 
 Finally, it sends a message with the header "stop" to stop the server and waits until the server closes the connection. 
 ####client.py:
 ```
-from tcp_messages import Client, Message
-client = Client()
+from tcp_messages import MessageClient, Message
+client = MessageClient()
 client.connect("127.0.0.1", 6500)
 client.connection.send(Message("greeting", "Merry Christmas"))
 while not client.messages:
@@ -64,12 +64,12 @@ Message routing is possible in both, server and client.
 example:
 ####server.py
 ```
-from tcp_messages import Server
+from tcp_messages import MessageServer
 from json_cpp import JsonObject, JsonList
 from random import randint, random, choice
 import string
 
-server = Server()
+server = MessageServer()
 server.router.add_route("int_value", lambda m: randint(0, 100))
 server.router.add_route("float_value", lambda m: random())
 server.router.add_route("string_value", lambda m: ''.join(choice(string.ascii_lowercase) for i in range(10)))
@@ -79,14 +79,13 @@ server.router.add_route("stop", lambda m: server.stop())
 server.start(port=6500) #service starts listening on port 6500
 print("server is running")
 server.join()
-
 ```
 ####client.py
 ```
-from tcp_messages import Client, Message
+from tcp_messages import MessageClient, Message
 from json_cpp import JsonObject, JsonList
 
-client = Client()
+client = MessageClient()
 client.router.add_route("int_value_response", lambda v: print("value:", v, "type:", type(v).__name__), int)
 client.router.add_route("float_value_response", lambda v: print("value:", v, "type:", type(v).__name__), float)
 client.router.add_route("string_value_response", lambda v: print("value:", v, "type:", type(v).__name__), str)

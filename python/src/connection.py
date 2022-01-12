@@ -1,4 +1,3 @@
-from .util import check_type
 from .message_list import MessageList
 from .message import Message
 import socket
@@ -10,8 +9,7 @@ class Connection:
         Open = 1
         Close = 4
 
-    def __init__(self, s, failed_message=None):
-        check_type(s, socket.socket, "incorrect type for s")
+    def __init__(self, s: socket.socket, failed_message=None):
         self.socket = s
         self.socket.settimeout(0.001)
         self.failed_message = failed_message
@@ -24,11 +22,10 @@ class Connection:
         self.state = Connection.State.Close
 
     def send(self, message: Message) -> bool:
-        check_type(message, Message, "incorrect type for message")
         message_str = str(message)
         message_bytes = message_str.encode()
         message_bytes += b'\x00'
-        self.socket.send(message_bytes)
+        return self.socket.send(message_bytes) == len(message_bytes)
 
     def peek(self):
         try:

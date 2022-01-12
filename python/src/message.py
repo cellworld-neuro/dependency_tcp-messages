@@ -6,13 +6,13 @@ from json_cpp import JsonObject, JsonList
 class Message(JsonObject):
 
     def __init__(self, header="", body=""):
+        JsonObject.__init__(self)
         self.header = header
         self.body = str(body)
         self._source = None
 
-    def get_body(self, body_type=None):
+    def get_body(self, body_type: type = None):
         if body_type:
-            check_type(body_type, type, "wrong type for body_body")
             if body_type is JsonObject or body_type is JsonList:
                 return JsonObject.load(self.body)
             elif issubclass(body_type, JsonObject) or issubclass(body_type, JsonList):

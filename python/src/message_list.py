@@ -1,4 +1,3 @@
-from .util import check_type
 from json_cpp import JsonList
 from .message import Message
 
@@ -7,8 +6,7 @@ class MessageList(JsonList):
     def __init__(self, iterable=None):
         JsonList.__init__(self, iterable, list_type=Message)
 
-    def queue(self, message):
-        check_type(message, Message, "wrong type for message")
+    def queue(self, message: Message):
         self.append(message)
 
     def dequeue(self) -> Message:

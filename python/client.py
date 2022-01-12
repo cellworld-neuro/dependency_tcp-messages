@@ -1,7 +1,7 @@
-from src import Client, Message
+from src import MessageClient, Message
 from json_cpp import JsonObject, JsonList
 
-client = Client()
+client = MessageClient()
 client.connect("127.0.0.1", 6500)
 client.connection.send(Message("int_value"))
 while not client.messages.contains("int_value_response"):

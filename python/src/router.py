@@ -6,6 +6,7 @@ from .util import check_type
 import re
 from json_cpp import JsonList, JsonObject
 
+
 class Router:
     def __init__(self):
         self.routes = {}
@@ -22,7 +23,11 @@ class Router:
         manifest = JsonList()
         for pattern in self.routes.keys():
             (handler, body_type) = self.routes[pattern]
-            manifest.append(JsonObject(route=pattern, input_type=body_type))
+            if body_type:
+                body_type_str = body_type.__name__
+            else:
+                body_type_str = ""
+            manifest.append(JsonObject(route=pattern, input_type=body_type_str))
         return manifest
 
     def route(self, message: Message):
@@ -105,10 +110,11 @@ class RouterProcess:
             if clean_up_required:
                 RouterProcess.__mutex.acquire()
                 for failed_connection in clean_up_required:
-                    del self.connections[failed_connection]
+                    try:
+                        del self.connections[failed_connection]
+                    except:
+                        pass
                 if len(self.connections) == 0:
                     RouterProcess.__handler = None
                     self.running = False
                 RouterProcess.__mutex.release()
-
-
