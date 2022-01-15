@@ -11,21 +11,12 @@ namespace tcp_messages{
     }
 
     Message Message_client::send_request(const Message &request, int time_out) {
+        Message_event event;
+        messages.add_message_event(request.id, event);
         if (!send_message(request)) throw "failed to send the request to server.";
-        auto check_point = std::chrono::high_resolution_clock::now();
-        auto time_stamp = std::chrono::high_resolution_clock::now();
-        auto ms = std::chrono::duration<double, std::milli>(time_stamp - check_point).count();
-        auto response_header = get_response_header(request.header);
-        while (!contains(response_header) && (ms < time_out || time_out == 0)){
-            time_stamp = std::chrono::high_resolution_clock::now();
-            ms = std::chrono::duration<double, std::milli>(time_stamp - check_point).count();
-        }
-        if (contains(response_header)) {
-            return get_message(response_header);
-        } else {
-            throw "request timed out";
-        }
+        return event.wait(time_out);
     }
+
 
     void Message_client::received_data(const std::string &data) {
         try {
@@ -80,5 +71,11 @@ namespace tcp_messages{
 
     Manifest Message_client::get_manifest() {
         return send_request(Message("!manifest")).get_body<Manifest>();
+    }
+
+    void Message_client::send_async_request(const Message &request, void (*call_back)(Response_type)) {
+        Message_event event(call_back);
+        messages.add_message_event(request.id, event);
+        if (!send_message(request)) throw "failed to send the request to server.";
     }
 }

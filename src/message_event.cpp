@@ -1,13 +1,16 @@
 #include <tcp_messages/message_event.h>
 
 namespace tcp_messages{
-    void Message_event::trigger(const tcp_messages::Message &message) {
-        if (call_back) call_back (message);
+    void Message_event::trigger(Response_type message) {
+        this->message = message;
+        if (call_back) {
+            call_back (message);
+        }
         std::unique_lock<std::mutex> lock(mtx);
         event.notify_all();
     }
 
-    Message_event::Message_event(void (*call_back)(const Message &)):
+    Message_event::Message_event(void (*call_back)(Response_type)):
     call_back(call_back){
     }
 

@@ -9,11 +9,13 @@ using namespace std;
 
 
 TEST_CASE("get_response") {
-    cout << get_response(Message("h1"), true) << endl;
-    cout << get_response(Message("h1"), 1) << endl;
-    cout << get_response(Message("h1"), "HELLO!") << endl;
-    cout << get_response(Message("h1"), Message("hola","1")) << endl;
-    cout << get_response(Message("h1"), true) << endl;
+    auto m = Message("h1");
+    cout << "request: " << m << endl;
+    cout << get_response(m, true) << endl;
+    cout << get_response(m, 1) << endl;
+    cout << get_response(m, "HELLO!") << endl;
+    cout << get_response(m, Message("hola","1")) << endl;
+    cout << get_response(m, true) << endl;
 }
 
 
@@ -25,14 +27,27 @@ struct Test_service : Message_service {
             Add_route_with_response("H4", h4, int);
             Add_route("stop", stop);
             )
-    int h1(int i) { return i+1; }
-    string h2(int i) { return to_string(i+1); }
-    bool h3(int i) { return i % 2; }
-    Message h4(int i) { return Message("H4_response",i+1); }
+    int h1(int i) {
+        return i+1;
+    }
+    string h2(int i) {
+        return to_string(i+1);
+    }
+    bool h3(int i) {
+        return i % 2;
+    }
+    Message h4(int i) {
+        return Message("H4_response",i+1);
+    }
 };
 
 using namespace std::chrono_literals;
 using namespace std::this_thread;
+
+Response_handler(async_handler_0){
+    cout << "async request: " << response << endl;
+}
+
 TEST_CASE("test_service") {
     Message_server<Test_service> s;
     cout << "starting server" << endl;
@@ -43,10 +58,21 @@ TEST_CASE("test_service") {
         cout << "message wait ends" << endl;
         Message_client c;
         c.connect("127.0.0.1", 6500);
-        cout << c.send_request(Message("H1",100)) << endl;
-        cout << c.send_request(Message("H2",100)) << endl;
-        cout << c.send_request(Message("H3",100)) << endl;
-        cout << c.send_request(Message("H4",100)) << endl;
+        auto m = Message("H1",100);
+        cout << "request :" << m << endl;
+        cout << "response :" << c.send_request(m,0) << endl;
+        m = Message("H2",100);
+        cout << "request :" << m << endl;
+        cout << "response :" << c.send_request(Message("H2",100),0) << endl;
+        m = Message("H3",100);
+        cout << "request :" << m << endl;
+        cout << "response :" << c.send_request(Message("H3",100),0) << endl;
+        m = Message("H4",100);
+        cout << "request :" << m << endl;
+        cout << "response :" << c.send_request(Message("H4",100),0) << endl;
+        m = Message("H4",100);
+        //c.send_async_request(m, async_handler_0);
+        sleep_for(1s);
         cout << c.send_request(Message("!manifest",100)).get_body<Manifest>() << endl;
         c.send_message(Message("stop"));
     });
@@ -60,8 +86,9 @@ TEST_CASE("test_message") {
     cout << Message("hello","hola!") << endl;
 }
 
-Message_event_handler(handler1, message){
-    cout << "event_handler: " << message << endl;
+
+Response_handler(handler1){
+    cout << "event_handler: " << response << endl;
 }
 
 
@@ -80,8 +107,8 @@ TEST_CASE("message_event") {
     sleep_for(1s);
 }
 
-Message_event_handler(test, message){
-    cout << "async worked: " << message << endl;
+Response_handler(test){
+    cout << "async worked: " << response << endl;
 }
 
 TEST_CASE("message_list_event_async") {
