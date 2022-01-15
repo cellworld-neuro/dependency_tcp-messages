@@ -19,12 +19,14 @@
 
 namespace tcp_messages {
     template<class T>
-    Message get_response(const std::string &request_header, T response) {
+    Message get_response(const Message &request, T response) {
         if constexpr (std::is_same_v<T, Message>) {
+            response.id = request.id;
             return response;
         }
         Message response_message;
-        response_message.header = get_response_header(request_header);
+        response_message.header = get_response_header(request.header);
+        response_message.id = request.id;
         if constexpr (std::is_same_v<bool, T> || std::is_same_v<const bool, T>) {
             if (response) {
                 response_message.body = "success";
@@ -45,7 +47,7 @@ namespace tcp_messages {
         try {                                                             \
                 __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)\
                 auto response = DESTINATION(__VA_OPT__(request)); \
-                send_message(tcp_messages::get_response(message.header, response));         \
+                send_message(tcp_messages::get_response(message, response));         \
         } catch (...) {                                                   \
             failed_route(message);                                        \
         }                                                                 \

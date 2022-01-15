@@ -9,6 +9,7 @@ class Message(JsonObject):
         JsonObject.__init__(self)
         self.header = header
         self.body = str(body)
+        self.id
         self._source = None
 
     def get_body(self, body_type: type = None):

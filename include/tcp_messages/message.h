@@ -19,8 +19,8 @@ namespace tcp_messages {
     std::string get_response_header(const std::string &request_header);
 
     struct Message : json_cpp::Json_object {
-        Message () = default;
         Message (const std::string &header);
+        Message (): Message(""){};
         template <class T>
         Message (const std::string &header, const T &body){
             this->header = header;
@@ -56,8 +56,10 @@ namespace tcp_messages {
         Json_object_members({
             Add_member(header);
             Add_member(body);
+            Add_optional_member(id);
         });
         std::string header;
         std::string body;
+        std::string id;
     };
 }
