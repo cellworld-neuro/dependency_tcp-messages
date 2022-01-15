@@ -18,7 +18,9 @@ set (tcp_messages_files
         src/message.cpp
         src/message_client.cpp
         src/message_router.cpp
-        src/message_server.cpp)
+        src/message_server.cpp
+        src/message_event.cpp
+        src/message_list.cpp)
 
 add_library(tcp_messages ${tcp_messages_files})
 

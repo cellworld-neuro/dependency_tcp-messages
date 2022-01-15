@@ -6,18 +6,18 @@ from .message_event import MessageEvent
 class MessageList(JsonList):
     def __init__(self, iterable=None):
         JsonList.__init__(self, iterable, list_type=Message)
-        self.pending_events = dict()
+        self.pending_responses = dict()
 
     def queue(self, message: Message):
-        if message.id in self.pending_events:
-            self.pending_events.pop(message.id).trigger(message)
+        if message.id in self.pending_responses:
+            self.pending_responses.pop(message.id).trigger(message)
         else:
             self.append(message)
 
     def add_message_event(self, request_id: str, event: MessageEvent):
-        if request_id in self.pending_events:
+        if request_id in self.pending_responses:
             return False
-        self.pending_events[request_id] = event
+        self.pending_responses[request_id] = event
         return True
 
     def dequeue(self) -> Message:

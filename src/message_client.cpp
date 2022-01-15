@@ -67,7 +67,7 @@ namespace tcp_messages{
     }
 
     void Message_client::unrouted_message(const Message &message) {
-        messages.push_back(message);
+        messages.queue(message);
     }
 
     bool Message_client::route(const Message &) {

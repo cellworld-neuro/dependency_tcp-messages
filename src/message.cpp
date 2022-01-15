@@ -16,8 +16,20 @@ namespace tcp_messages {
     }
 
     Message::Message(const std::string &header) :
-    header(header),
-    id(random_hex(8) + "-" + random_hex(4) + "-" + random_hex(4) + "-" + random_hex(4) + "-" + random_hex(12)){
+    header(header){
+        set_id();
+    }
+
+    void Message::set_id() {
+        id = random_hex(8) + "-" + random_hex(4) + "-" + random_hex(4) + "-" + random_hex(4) + "-" + random_hex(12);
+    }
+
+    void Message::set_id(const string &new_id) {
+        id = new_id;
+    }
+
+    Message::Message() {
+        set_id();
     }
 
     void Manifest::add_route(const std::string &route, const std::string &input_type) {

@@ -1,7 +1,7 @@
 #pragma once
-#include <deque>
 #include <easy_tcp.h>
 #include <tcp_messages/message.h>
+#include <tcp_messages/message_list.h>
 
 namespace tcp_messages {
     struct Message_client: easy_tcp::Client {
@@ -16,6 +16,6 @@ namespace tcp_messages {
         Manifest get_manifest();
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
-        std::deque<Message> messages;
+        Message_list messages;
     };
 }

@@ -39,7 +39,7 @@ TEST_CASE("test_service") {
     s.start(6500);
     thread t([](){
         cout << "message wait start" << endl;
-        sleep_for(5s);
+        sleep_for(1s);
         cout << "message wait ends" << endl;
         Message_client c;
         c.connect("127.0.0.1", 6500);
@@ -58,4 +58,51 @@ TEST_CASE("test_service") {
 
 TEST_CASE("test_message") {
     cout << Message("hello","hola!") << endl;
+}
+
+Message_event_handler(handler1, message){
+    cout << "event_handler: " << message << endl;
+}
+
+
+TEST_CASE("message_event") {
+    Message_event event(handler1);
+    thread t([&event](){
+        sleep_for(1s);
+        Message message( "test_header", "test_body");
+        event.trigger(message);
+    });
+    cout<< "wait start" << endl;
+    auto m = event.wait(2000);
+    cout << "sync:" << m << endl;
+    cout<< "wait end" << endl;
+    if (t.joinable()) t.join();
+    sleep_for(1s);
+}
+
+Message_event_handler(test, message){
+    cout << "async worked: " << message << endl;
+}
+
+TEST_CASE("message_list_event_async") {
+    Message_event event(test);
+    Message request( "test_header", "test_body");
+    Message_list list;
+    list.add_message_event(request.id, event);
+    list.queue(request);
+}
+
+TEST_CASE("message_list_event_sync") {
+    Message_event event;
+    Message request( "test_header", "test_body");
+    Message_list list;
+    list.add_message_event(request.id, event);
+    thread t([&list, &request](){
+        sleep_for(1s);
+        list.queue(request);
+    });
+    cout << "waiting..." << endl;
+    auto m = event.wait(2000);
+    if (t.joinable()) t.join();
+    cout << "sync worked: " << m << endl;
 }

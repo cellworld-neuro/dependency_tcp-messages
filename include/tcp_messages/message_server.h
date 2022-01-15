@@ -2,6 +2,7 @@
 #include <easy_tcp.h>
 #include <json_cpp.h>
 #include <tcp_messages/message.h>
+#include <tcp_messages/message_list.h>
 
 namespace tcp_messages {
     struct Message_service : easy_tcp::Service {
@@ -11,6 +12,7 @@ namespace tcp_messages {
         virtual void unrouted_message(const Message &);
         void on_incoming_data(const std::string &) override;
         bool send_message(const Message &);
+        Message_list messages;
     };
 
     template<class T>

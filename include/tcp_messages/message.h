@@ -20,11 +20,12 @@ namespace tcp_messages {
 
     struct Message : json_cpp::Json_object {
         Message (const std::string &header);
-        Message (): Message(""){};
+        Message ();
         template <class T>
         Message (const std::string &header, const T &body){
             this->header = header;
             set_body(body);
+            set_id();
         }
         template <class T>
         T get_body() const{
@@ -58,6 +59,8 @@ namespace tcp_messages {
             Add_member(body);
             Add_optional_member(id);
         });
+        void set_id();
+        void set_id(const std::string &);
         std::string header;
         std::string body;
         std::string id;

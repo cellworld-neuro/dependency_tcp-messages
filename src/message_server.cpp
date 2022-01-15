@@ -14,8 +14,8 @@ namespace tcp_messages{
     }
 
 
-    void Message_service::unrouted_message(const Message &) {
-
+    void Message_service::unrouted_message(const Message &message) {
+        messages.queue(message);
     }
 
     void Message_service::on_incoming_data(const string &data) {
