@@ -2,26 +2,19 @@
 #include <thread>
 #include <chrono>
 #include <tcp_messages.h>
+#include <iomanip>
 
 using namespace tcp_messages;
 using namespace std;
 
+
 TEST_CASE("get_response") {
-    cout << get_response("h1", true) << endl;
-    cout << get_response("h1", 1) << endl;
-    cout << get_response("h1", "HELLO!") << endl;
-    cout << get_response("h1", Message("hola","1")) << endl;
-    cout << get_response("h1", true) << endl;
+    cout << get_response(Message("h1"), true) << endl;
+    cout << get_response(Message("h1"), 1) << endl;
+    cout << get_response(Message("h1"), "HELLO!") << endl;
+    cout << get_response(Message("h1"), Message("hola","1")) << endl;
+    cout << get_response(Message("h1"), true) << endl;
 }
-//
-//struct test_data :json_cpp::Json_object{
-//    Json_object_members(
-//        Add_member(d1);
-//            Add_member(d2)
-//    )
-//    std::string d1;
-//    std::string d2;
-//};
 
 
 struct Test_service : Message_service {
