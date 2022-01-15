@@ -91,32 +91,8 @@ Response_handler(handler1){
     cout << "event_handler: " << response << endl;
 }
 
-
-TEST_CASE("message_event") {
-    Message_event event(handler1);
-    thread t([&event](){
-        sleep_for(1s);
-        Message message( "test_header", "test_body");
-        event.trigger(message);
-    });
-    cout<< "wait start" << endl;
-    auto m = event.wait(2000);
-    cout << "sync:" << m << endl;
-    cout<< "wait end" << endl;
-    if (t.joinable()) t.join();
-    sleep_for(1s);
-}
-
 Response_handler(test){
     cout << "async worked: " << response << endl;
-}
-
-TEST_CASE("message_list_event_async") {
-    Message_event event(test);
-    Message request( "test_header", "test_body");
-    Message_list list;
-    list.add_message_event(request.id, event);
-    list.queue(request);
 }
 
 TEST_CASE("message_list_event_sync") {

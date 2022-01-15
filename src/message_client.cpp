@@ -74,8 +74,9 @@ namespace tcp_messages{
     }
 
     void Message_client::send_async_request(const Message &request, void (*call_back)(Response_type)) {
-        Message_event event(call_back);
-        messages.add_message_event(request.id, event);
-        if (!send_message(request)) throw "failed to send the request to server.";
+        thread ([&request, &call_back, this] (){
+            auto response = send_request(request, 0);
+            call_back(response);
+        }).detach();
     }
 }

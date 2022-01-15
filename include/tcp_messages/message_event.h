@@ -8,11 +8,9 @@
 namespace tcp_messages {
     struct Message_event {
         Message_event() = default;
-        explicit Message_event(void (*call_back)(Response_type));
         void trigger(Response_type);
         Message &wait(int time_out=500);
 
-        void (*call_back)(Response_type) = nullptr;
         std::condition_variable event;
         Message message;
         std::mutex mtx;
