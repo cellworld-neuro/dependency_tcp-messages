@@ -1,7 +1,7 @@
 from .util import check_type
 import json
 from json_cpp import JsonObject, JsonList
-
+from uuid import uuid1
 
 class Message(JsonObject):
 
@@ -9,7 +9,7 @@ class Message(JsonObject):
         JsonObject.__init__(self)
         self.header = header
         self.body = str(body)
-        self.id
+        self.id = str(uuid1())
         self._source = None
 
     def get_body(self, body_type: type = None):

@@ -72,6 +72,7 @@ class RouterProcess:
         if RouterProcess.__handler:
             raise Exception("ConnectionHandler is a singleton, use ConnectionHandler.handle")
         self.connections = list()
+        self.incoming_messages_threads = []
         self.running = False
         self.thread = Thread(target=self.__process__)
         self.thread.daemon = True
@@ -79,6 +80,25 @@ class RouterProcess:
         while not self.running:
             pass
         RouterProcess.__handler = self
+
+    @staticmethod
+    def __incoming_message__(connection: Connection, router: Router, message: Message):
+        message._source = connection
+        responses = router.route(message)
+        if responses:
+            for response in responses:
+                if isinstance(response, Message):
+                    response.id = message.id
+                    connection.send(response)
+                elif isinstance(response, bool):
+                    response_message = Message(message.header + "_response", "success" if response else "fail")
+                    response_message.id = message.id
+                    connection.send(response_message)
+                else:
+                    if response:
+                        response_message = Message(message.header + "_response", str(response))
+                        response_message.id = message.id
+                        connection.send(response_message)
 
     def __process__(self):
         self.running = True
@@ -89,23 +109,12 @@ class RouterProcess:
                     if connection.state == Connection.State.Open:
                         message = connection.receive()
                         if message:
-                            message._source = connection
-                            responses = router.route(message)
-                            if responses:
-                                for response in responses:
-                                    if isinstance(response, Message):
-                                        connection.send(response)
-                                    elif isinstance(response, bool):
-                                        response_message = Message(message.header + "_response", "success" if response else "fail")
-                                        connection.send(response_message)
-                                    else:
-                                        if response:
-                                            response_message = Message(message.header + "_response", str(response))
-                                            connection.send(response_message)
+                            #RouterProcess.__incoming_message(connection, router, message)
+                            Thread(target=RouterProcess.__incoming_message__, args=(connection, router, message)).start()
                     else:
                         clean_up_required.append(index)
                 except:
-                    clean_up_required.append(index)
+                   clean_up_required.append(index)
 
             if clean_up_required:
                 RouterProcess.__mutex.acquire()
@@ -118,3 +127,13 @@ class RouterProcess:
                     RouterProcess.__handler = None
                     self.running = False
                 RouterProcess.__mutex.release()
+
+            to_remove = []
+            while len(self.incoming_messages_threads) >= 10:
+                for t in self.incoming_messages_threads:
+                    if not t.is_alive():
+                        to_remove.append(t)
+                for t in to_remove:
+                    self.incoming_messages_threads.remove(t)
+
+

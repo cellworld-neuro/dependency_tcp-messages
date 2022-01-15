@@ -1,13 +1,24 @@
 from json_cpp import JsonList
 from .message import Message
+from .message_event import MessageEvent
 
 
 class MessageList(JsonList):
     def __init__(self, iterable=None):
         JsonList.__init__(self, iterable, list_type=Message)
+        self.pending_events = dict()
 
     def queue(self, message: Message):
-        self.append(message)
+        if message.id in self.pending_events:
+            self.pending_events.pop(message.id).trigger(message)
+        else:
+            self.append(message)
+
+    def add_message_event(self, request_id: str, event: MessageEvent):
+        if request_id in self.pending_events:
+            return False
+        self.pending_events[request_id] = event
+        return True
 
     def dequeue(self) -> Message:
         if len(self):
@@ -37,3 +48,4 @@ class MessageList(JsonList):
                 message = self[i]
                 del self[i]
         return message
+

@@ -1,28 +1,27 @@
+from time import sleep
 from src import MessageClient, Message
-from json_cpp import JsonObject, JsonList
 
 client = MessageClient()
-client.connect("127.0.0.1", 6500)
-client.connection.send(Message("int_value"))
-while not client.messages.contains("int_value_response"):
-    pass
-print(client.messages.get_message("int_value_response").get_body(int))
-client.connection.send(Message("float_value"))
-while not client.messages.contains("float_value_response"):
-    pass
-print(client.messages.get_message("float_value_response").get_body(float))
-client.connection.send(Message("string_value"))
-while not client.messages.contains("string_value_response"):
-    pass
-print(client.messages.get_message("string_value_response").get_body(str))
-client.connection.send(Message("JsonObject_value"))
-while not client.messages.contains("JsonObject_value_response"):
-    pass
-print(client.messages.get_message("JsonObject_value_response").get_body(JsonObject))
-client.connection.send(Message("JsonList_value"))
-while not client.messages.contains("JsonList_value_response"):
-    pass
-print(client.messages.get_message("JsonList_value_response").get_body(JsonList))
-client.connection.send(Message("stop"))
-while client:
-    pass
+client.connect("127.0.0.1", 8500)
+print(client.send_request(Message("int_value"), 0))
+
+# print(client.send_request(Message("float_value")))
+#
+# print(client.send_request(Message("string_value")))
+#
+# print(client.send_request(Message("JsonObject_value")))
+#
+# print(client.send_request(Message("JsonList_value")))
+
+
+def async_response_proc(message:Message):
+    print("response", message)
+
+client.send_async_request(Message("int_value"), async_response_proc)
+
+print("waiting")
+
+sleep(10)
+
+print("stopping")
+print(client.send_message(Message("stop")))

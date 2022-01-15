@@ -20,14 +20,42 @@ class MessageServer:
         self.running = False
         self.thread = Thread(target=self.__proc__)
         self.thread.daemon = True
+        self.allow_subscription = False
+        self.subscriptions = []
+
+    def broadcast(self, message: Message):
+        to_remove = []
+        for connection in self.connections:
+            try:
+                connection.send(message)
+            except:
+                to_remove.append(connection)
+        for connection in to_remove:
+            self.connections.remove(connection)
+
+    def broadcast_subscribed(self, message: Message):
+        to_remove = []
+        for connection in self.subscriptions:
+            try:
+                connection.send(message)
+            except:
+                to_remove.append(connection)
+        for connection in to_remove:
+            self.connections.remove(connection)
 
     def __unrouted__(self, message: Message):
         self.messages.append(message)
+
+    def __subscribe_connection__(self, message: Message):
+        self.subscriptions.append(message._source)
+        return True
 
     def start(self, port: int):
         self.server.bind((self.ip, port))
         self.server.listen()
         self.server.settimeout(0.001)
+        if self.allow_subscription:
+            self.router.add_route("!subscribe", self.__subscribe_connection__)
         self.thread.start()
         while not self.running:
             pass
