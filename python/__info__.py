@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 15 
+	return 1, 0, 16 
 
 
 def __module_name__():
@@ -43,7 +43,7 @@ def __package_name__():
 
 
 def __files__():
-	return ['message_client.py', 'connection.py', 'message.py', 'message_list.py', 'router.py', 'message_server.py', 'util.py'] 
+	return ['message_client.py', 'connection.py', 'message.py', 'message_list.py', 'router.py', 'message_server.py', 'util.py', 'message_event.py'] 
 
 
 def __setup_py__():
