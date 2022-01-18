@@ -47,6 +47,9 @@ class MessageClient:
     def get_manifest(self):
         return self.send_request(Message("!manifest")).get_body(JsonList)
 
+    def subscribe(self):
+        return self.send_request(Message("!subscribe")).body == "success"
+
     def send_message(self, message: Message):
         self.connection.send(message)
 

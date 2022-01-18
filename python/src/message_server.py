@@ -46,6 +46,9 @@ class MessageServer:
     def __unrouted__(self, message: Message):
         self.messages.append(message)
 
+    def __subscribe_connection_fail__(self, message: Message):
+        return False
+
     def __subscribe_connection__(self, message: Message):
         self.subscriptions.append(message._source)
         return True
@@ -56,6 +59,8 @@ class MessageServer:
         self.server.settimeout(0.001)
         if self.allow_subscription:
             self.router.add_route("!subscribe", self.__subscribe_connection__)
+        else:
+            self.router.add_route("!subscribe", self.__subscribe_connection_fail__)
         self.thread.start()
         while not self.running:
             pass
