@@ -152,23 +152,28 @@ TEST_CASE("test_server") {
         Test_client c("T1");
         c.connect("127.0.0.1", 6500);
         c.subscribe();
-        while(true);
+        c.join();
     });
     thread t2([](){
         Test_client c("T2");
         c.connect("127.0.0.1", 6500);
-        while(true);
+        c.join();
     });
     thread t3([](){
         Test_client c("T3");
         c.connect("127.0.0.1", 6500);
         cout << "T3 Response" << c.send_request(Message("H7")) << endl;
         cout << "T3 Response" << c.send_request(Message("H8")) << endl;
-        while(true);
+        c.join();
     });
     sleep_for(2s);
     s.broadcast(Message("h5_called"));
     s.broadcast_subscribed(Message("h6_called"));
+    sleep_for(2s);
+    s.stop();
     s.join();
     cout << "stopping server" << endl;
+    t1.join();
+    t2.join();
+    t3.join();
 }
