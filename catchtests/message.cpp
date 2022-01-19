@@ -25,6 +25,8 @@ struct Test_service : Message_service {
             Add_route_with_response("H2", h2, int);
             Add_route_with_response("H3", h3, int);
             Add_route_with_response("H4", h4, int);
+            Add_route_with_response("H7", h7);
+            Add_route_with_response("H8", h8);
             Add_route("stop", stop);
             )
     int h1(int i) {
@@ -38,6 +40,14 @@ struct Test_service : Message_service {
     }
     Message h4(int i) {
         return Message("H4_response",i+1);
+    }
+    bool h7() {
+        broadcast(Message("h7_called"));
+        return true;
+    }
+    bool h8() {
+        broadcast_subscribed(Message("h8_called"));
+        return true;
     }
 };
 
@@ -81,7 +91,6 @@ TEST_CASE("test_service") {
     t.join();
 }
 
-
 TEST_CASE("test_message") {
     cout << Message("hello","hola!") << endl;
 }
@@ -108,4 +117,58 @@ TEST_CASE("message_list_event_sync") {
     auto m = event.wait(2000);
     if (t.joinable()) t.join();
     cout << "sync worked: " << m << endl;
+}
+
+
+struct Test_client : Message_client {
+    Test_client(const string &name) : name(name) {}
+    Routes(
+            Add_route("h5_called",h5_called);
+            Add_route("h6_called",h6_called);
+            Add_route("h7_called",h7_called);
+            Add_route("h8_called",h8_called);
+    )
+    void h5_called() {
+        cout << name << ": h5_called!!" << endl;
+    }
+    void h6_called() {
+        cout << name << ": h6_called!!" << endl;
+    };
+    void h7_called() {
+        cout << name << ": h7_called!!" << endl;
+    }
+    void h8_called() {
+        cout << name << ": h8_called!!" << endl;
+    };
+    string name;
+};
+
+
+TEST_CASE("test_server") {
+    Message_server<Test_service> s;
+    cout << "starting server" << endl;
+    s.start(6500);
+    thread t1([](){
+        Test_client c("T1");
+        c.connect("127.0.0.1", 6500);
+        c.subscribe();
+        while(true);
+    });
+    thread t2([](){
+        Test_client c("T2");
+        c.connect("127.0.0.1", 6500);
+        while(true);
+    });
+    thread t3([](){
+        Test_client c("T3");
+        c.connect("127.0.0.1", 6500);
+        cout << "T3 Response" << c.send_request(Message("H7")) << endl;
+        cout << "T3 Response" << c.send_request(Message("H8")) << endl;
+        while(true);
+    });
+    sleep_for(2s);
+    s.broadcast(Message("h5_called"));
+    s.broadcast_subscribed(Message("h6_called"));
+    s.join();
+    cout << "stopping server" << endl;
 }

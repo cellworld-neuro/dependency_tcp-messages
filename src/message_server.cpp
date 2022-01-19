@@ -35,4 +35,19 @@ namespace tcp_messages{
     bool Message_service::send_message(const Message &message) {
         return send_data(message.to_json());
     }
+
+    void Message_service::broadcast(const Message &message) {
+        auto message_server=(Message_server<Message_service> *) this->_server;
+        message_server->broadcast(message);
+    }
+
+    void Message_service::broadcast_subscribed(const Message &message) {
+        auto message_server=(Message_server<Message_service> *) this->_server;
+        message_server->broadcast_subscribed(message);
+    }
+
+    bool Message_service::subscribe() {
+        _subscribed = true;
+        return false;
+    }
 }

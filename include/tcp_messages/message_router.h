@@ -60,5 +60,6 @@ namespace tcp_messages {
     bool routed = false;                                                               \
     ADD_ROUTES;                                                                        \
     Add_route_with_response("!manifest", [manifest](){return manifest;});              \
+    Add_route_with_response("!subscribe", subscribe);                                  \
     return routed;                                                                     \
 }

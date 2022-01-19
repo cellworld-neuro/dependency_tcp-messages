@@ -79,4 +79,8 @@ namespace tcp_messages{
             call_back(response);
         }).detach();
     }
+
+    bool Message_client::subscribe() {
+        return send_request(Message("!subscribe")).get_body<bool>();
+    }
 }

@@ -31,7 +31,9 @@ namespace tcp_messages {
         T get_body() const{
             if constexpr (std::is_same_v<T, std::string>) {
                 return body;
-            }  else if constexpr (std::is_base_of<json_cpp::Json_base ,T>::value) {
+            } else if constexpr (std::is_same_v<T, bool>) {
+                return body == "success" || body == "true" || body == "1";
+            } else if constexpr (std::is_base_of<json_cpp::Json_base ,T>::value) {
                 return json_cpp::Json_create<T>(this->body);
             } else {
                 T x;
