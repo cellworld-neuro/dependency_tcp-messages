@@ -22,6 +22,7 @@ class MessageServer:
         self.thread.daemon = True
         self.allow_subscription = False
         self.subscriptions = []
+        self.on_new_connection = None
 
     def broadcast(self, message: Message):
         to_remove = []
@@ -82,6 +83,8 @@ class MessageServer:
                     client_connection = Connection(client, self.failed_messages)
                     self.connections.append(client_connection)
                     self.router.attend(client_connection)
+                    if self.on_new_connection:
+                        self.on_new_connection(client_connection)
 
             except socket.timeout:
                 pass# no pending connecttions
