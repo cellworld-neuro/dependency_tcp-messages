@@ -18,11 +18,12 @@ class Message(JsonObject):
                 return JsonObject.load(self.body)
             elif issubclass(body_type, JsonObject) or issubclass(body_type, JsonList):
                 return body_type.parse(self.body)
+            elif body_type is str:
+                return self.body
+            elif body_type is bool:
+                return self.body == "success" or self.body == "true" or self.body == "1"
             else:
-                if body_type is str:
-                    return self.body
-                else:
-                    return body_type(json.loads(self.body))
+                return body_type(json.loads(self.body))
         else:
             return self.body
 
