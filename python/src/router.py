@@ -1,6 +1,7 @@
 from threading import Thread, Lock
 import types
 from .message import Message
+from .message_event import MessageEvent
 from .connection import Connection
 from .util import check_type
 import re
@@ -14,6 +15,13 @@ class Router:
         self.failed_route = None
         self.unrouted_message = None
         self.routing_count = 0
+        self.pending_responses = dict()
+
+    def add_message_event(self, request_id: str, event: MessageEvent):
+        if request_id in self.pending_responses:
+            return False
+        self.pending_responses[request_id] = event
+        return True
 
     def add_route(self, pattern: str, handler, body_type=None):
         check_type(handler, (types.FunctionType, types.MethodType), "incorrect type for handler")
@@ -33,6 +41,9 @@ class Router:
     def route(self, message: Message):
         responses = []
         check_type(message, Message, "incorrect type for message")
+        if message.id in self.pending_responses:
+            self.pending_responses[message.id].trigger(message)
+            return responses
         if message.header == "!manifest":
             responses.append(self.get_manifest())
         for pattern in self.routes.keys():

@@ -42,7 +42,7 @@ class MessageServer:
             except:
                 to_remove.append(connection)
         for connection in to_remove:
-            self.connections.remove(connection)
+            self.subscriptions.remove(connection)
 
     def __unrouted__(self, message: Message):
         self.messages.append(message)

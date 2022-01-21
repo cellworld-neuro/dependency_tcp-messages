@@ -32,7 +32,7 @@ class MessageClient:
 
     def send_request(self, message: Message, time_out: int = 500) -> Message:
         event = MessageEvent()
-        self.messages.add_message_event(request_id=message.id, event=event)
+        self.router.add_message_event(request_id=message.id, event=event)
         self.send_message(message)
         response = event.wait(time_out)
         if response:
@@ -41,7 +41,7 @@ class MessageClient:
 
     def send_async_request(self, message: Message, call_back):
         event = MessageEvent(call_back=call_back)
-        self.messages.add_message_event(request_id=message.id, event=event)
+        self.router.add_message_event(request_id=message.id, event=event)
         self.send_message(message)
 
     def get_manifest(self):
