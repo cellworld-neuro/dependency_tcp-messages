@@ -2,6 +2,8 @@
 #include <easy_tcp.h>
 #include <tcp_messages/message.h>
 #include <tcp_messages/message_list.h>
+#include <tcp_messages/message_event.h>
+#include <map>
 
 namespace tcp_messages {
     struct Message_client: easy_tcp::Client {
@@ -19,5 +21,6 @@ namespace tcp_messages {
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
         Message_list messages;
+        std::map<std::string,Message_event &> pending_responses;
     };
 }

@@ -12,17 +12,23 @@ namespace tcp_messages{
 
     Message Message_client::send_request(const Message &request, int time_out) {
         Message_event event;
-        messages.add_message_event(request.id, event);
+        //messages.add_message_event(request.id, event);
+        pending_responses.insert(std::pair<std::string,Message_event &>(request.id, event));
         if (!send_message(request)) throw "failed to send the request to server.";
         return event.wait(time_out);
     }
 
-
     void Message_client::received_data(const std::string &data) {
         try {
             auto message = json_cpp::Json_create<Message>(data);
-            if (!route(message))
-                unrouted_message(message);
+            if (pending_responses.contains(message.id)){
+                auto &event = pending_responses.at(message.id);
+                pending_responses.erase(message.id);
+                event.trigger(message);
+            } else {
+                if (!route(message))
+                    unrouted_message(message);
+            }
         } catch (...) {
             failed_message(data);
         }
