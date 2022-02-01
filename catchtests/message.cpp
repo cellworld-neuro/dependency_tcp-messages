@@ -8,15 +8,15 @@ using namespace tcp_messages;
 using namespace std;
 
 
-//TEST_CASE("get_response") {
-//    auto m = Message("h1");
-//    cout << "request: " << m << endl;
-//    cout << get_response(m, true) << endl;
-//    cout << get_response(m, 1) << endl;
-//    cout << get_response(m, "HELLO!") << endl;
-//    cout << get_response(m, Message("hola","1")) << endl;
-//    cout << get_response(m, true) << endl;
-//}
+TEST_CASE("get_response") {
+    auto m = Message("h1");
+    cout << "request: " << m << endl;
+    cout << get_response(m, true) << endl;
+    cout << get_response(m, 1) << endl;
+    cout << get_response(m, "HELLO!") << endl;
+    cout << get_response(m, Message("hola","1")) << endl;
+    cout << get_response(m, true) << endl;
+}
 
 
 struct Test_service : Message_service {
