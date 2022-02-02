@@ -50,6 +50,9 @@ class MessageClient:
     def subscribe(self):
         return self.send_request(Message("!subscribe")).body == "success"
 
+    def unsubscribe(self):
+        return self.send_request(Message("!unsubscribe")).body == "success"
+
     def send_message(self, message: Message):
         self.connection.send(message)
 

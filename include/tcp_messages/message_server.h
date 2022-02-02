@@ -15,10 +15,13 @@ namespace tcp_messages {
         bool send_message(const Message &);
         void broadcast(const Message &);
         void broadcast_subscribed(const Message &);
-        bool subscribe();
+
         Message_list messages;
         bool _subscribed;
         void *_server;
+    protected:
+        bool _subscribe();
+        bool _unsubscribe();
     };
 
     template<class T>

@@ -46,8 +46,13 @@ namespace tcp_messages{
         message_server->broadcast_subscribed(message);
     }
 
-    bool Message_service::subscribe() {
+    bool Message_service::_subscribe() {
         _subscribed = true;
-        return false;
+        return true;
+    }
+
+    bool Message_service::_unsubscribe() {
+        _subscribed = false;
+        return true;
     }
 }

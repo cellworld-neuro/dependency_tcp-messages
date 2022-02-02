@@ -28,6 +28,7 @@ struct Test_service : Message_service {
             Add_route_with_response("H7", h7);
             Add_route_with_response("H8", h8);
             Add_route("stop", stop);
+            Allow_subscription();
             )
     int h1(int i) {
         return i+1;
