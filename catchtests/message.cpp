@@ -3,6 +3,7 @@
 #include <chrono>
 #include <tcp_messages.h>
 #include <iomanip>
+#include <fstream>
 
 using namespace tcp_messages;
 using namespace std;
@@ -27,6 +28,7 @@ struct Test_service : Message_service {
             Add_route_with_response("H4", h4, int);
             Add_route_with_response("H7", h7);
             Add_route_with_response("H8", h8);
+            Add_route_with_response("H9", h9);
             Add_route("stop", stop);
             )
     int h1(int i) {
@@ -48,6 +50,14 @@ struct Test_service : Message_service {
     bool h8() {
         broadcast_subscribed(Message("h8_called"));
         return true;
+    }
+    string h9() {
+        cout << "massive called " << endl;
+        std::ifstream t("json");
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        auto response = buffer.str();
+        return response;
     }
 };
 
@@ -164,6 +174,7 @@ TEST_CASE("test_server") {
         c.connect("127.0.0.1", 6500);
         cout << "T3 Response" << c.send_request(Message("H7")) << endl;
         cout << "T3 Response" << c.send_request(Message("H8")) << endl;
+        cout << "T3 Response" << c.send_request(Message("H9"), 0) << endl;
         c.join();
     });
     sleep_for(2s);
@@ -175,5 +186,23 @@ TEST_CASE("test_server") {
     cout << "stopping server" << endl;
     t1.join();
     t2.join();
+    t3.join();
+}
+
+
+TEST_CASE("long_message") {
+    Message_server<Test_service> s;
+    cout << "starting server" << endl;
+    s.start(6500);
+    thread t3([](){
+        Test_client c("T3");
+        c.connect("127.0.0.1", 6500);
+        auto response = c.send_request(Message("H9"),0);
+        cout << "T9 Response: " << response << endl;
+        c.join();
+    });
+    sleep_for(2s);
+    s.stop();
+    s.join();
     t3.join();
 }

@@ -3,6 +3,7 @@
 #include <json_cpp.h>
 #include <tcp_messages/message.h>
 #include <tcp_messages/message_list.h>
+#include <map>
 
 namespace tcp_messages {
 
@@ -17,6 +18,7 @@ namespace tcp_messages {
         void broadcast_subscribed(const Message &);
         bool subscribe();
         Message_list messages;
+        std::map<std::string, Message_parts> _partials;
         bool _subscribed;
         void *_server;
     };

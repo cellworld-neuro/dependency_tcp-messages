@@ -3,7 +3,7 @@
 
 
 using namespace std;
-namespace tcp_messages{
+namespace tcp_messages {
 
     void Message_service::failed_route(const Message &m) {
         cerr << "Server: failed to route message " << m << endl;
@@ -19,21 +19,33 @@ namespace tcp_messages{
     }
 
     void Message_service::on_incoming_data(const string &data) {
-        bool msg_converted = false;
         Message message;
         try {
             data >> message;
-            msg_converted = true;
+            if (message.parts > 1) {
+                if (!_partials.contains(message.id)) {
+                    _partials[message.id] = Message_parts();
+                }
+                _partials[message.id].push_back(message);
+                if( _partials[message.id].is_ready()) {
+                    message = _partials[message.id].join();
+                    _partials.erase(message.id);
+                } else {
+                    return ;
+                }
+            }
+            if (!route(message)) unrouted_message(message);
         } catch (...) {
             failed_message(data);
-        }
-        if (msg_converted) {
-            if (!route(message)) unrouted_message(message);
         }
     }
 
     bool Message_service::send_message(const Message &message) {
-        return send_data(message.to_json());
+        Message_parts parts (message);
+        for (auto &part:parts) {
+            if (!send_data(part.to_json())) return false;
+        }
+        return true;
     }
 
     void Message_service::broadcast(const Message &message) {

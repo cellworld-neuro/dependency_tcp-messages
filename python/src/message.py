@@ -5,11 +5,13 @@ from uuid import uuid1
 
 class Message(JsonObject):
 
-    def __init__(self, header="", body=""):
+    def __init__(self, header: str = "", body="", seq: int = 0, parts: int = 1):
         JsonObject.__init__(self)
         self.header = header
         self.body = str(body)
         self.id = str(uuid1())
+        self.seq = seq
+        self.parts = parts
         self._source = None
 
     def get_body(self, body_type: type = None):

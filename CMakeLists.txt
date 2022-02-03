@@ -59,7 +59,10 @@ target_link_libraries(tcp_messages
 ####
 
 install_dependency(https://github.com/germanespinosa/catch CatchTests)
-test_library(tcp_messages)
+
+test_library(tcp_messages catchtests/message.cpp)
+
+test_library(tcp_messages catchtests/long_message.cpp)
 
 
 ###

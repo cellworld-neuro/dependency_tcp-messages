@@ -7,13 +7,17 @@ using namespace std;
 namespace tcp_messages{
 
     bool Message_client::send_message(const Message &message) {
-        return send_data(message.to_json());
+        Message_parts parts (message);
+        for (auto &part:parts) {
+            if (!send_data(part.to_json())) return false;
+        }
+        return true;
     }
 
     Message Message_client::send_request(const Message &request, int time_out) {
         Message_event event;
         //messages.add_message_event(request.id, event);
-        pending_responses.insert(std::pair<std::string,Message_event &>(request.id, event));
+        _pending_responses.insert(std::pair<std::string,Message_event &>(request.id, event));
         if (!send_message(request)) throw "failed to send the request to server.";
         return event.wait(time_out);
     }
@@ -21,9 +25,23 @@ namespace tcp_messages{
     void Message_client::received_data(const std::string &data) {
         try {
             auto message = json_cpp::Json_create<Message>(data);
-            if (pending_responses.contains(message.id)){
-                auto &event = pending_responses.at(message.id);
-                pending_responses.erase(message.id);
+
+            if (message.parts > 1) {
+                if (!_partials.contains(message.id)) {
+                    _partials[message.id] = Message_parts();
+                }
+                _partials[message.id].push_back(message);
+                if( _partials[message.id].is_ready()) {
+                    message = _partials[message.id].join();
+                    _partials.erase(message.id);
+                } else {
+                    return ;
+                }
+            }
+
+            if (_pending_responses.contains(message.id)){
+                auto &event = _pending_responses.at(message.id);
+                _pending_responses.erase(message.id);
                 event.trigger(message);
             } else {
                 if (!route(message))

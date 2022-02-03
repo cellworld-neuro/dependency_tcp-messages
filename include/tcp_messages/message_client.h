@@ -21,6 +21,7 @@ namespace tcp_messages {
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
         Message_list messages;
-        std::map<std::string,Message_event &> pending_responses;
+        std::map<std::string,Message_event &> _pending_responses;
+        std::map<std::string, Message_parts> _partials;
     };
 }
