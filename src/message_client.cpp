@@ -24,19 +24,22 @@ namespace tcp_messages{
 
     void Message_client::received_data(const std::string &data) {
         try {
-            auto message = json_cpp::Json_create<Message>(data);
+            Message message;
+            auto message_part = json_cpp::Json_create<Message_part>(data);
 
-            if (message.parts > 1) {
-                if (!_partials.contains(message.id)) {
-                    _partials[message.id] = Message_parts();
+            if (message_part.parts > 1) {
+                if (!_partials.contains(message_part.id)) {
+                    _partials[message_part.id] = Message_parts();
                 }
-                _partials[message.id].push_back(message);
-                if( _partials[message.id].is_ready()) {
-                    message = _partials[message.id].join();
-                    _partials.erase(message.id);
+                _partials[message_part.id].push_back(message_part);
+                if( _partials[message_part.id].is_ready()) {
+                    message = _partials[message_part.id].join();
+                    _partials.erase(message_part.id);
                 } else {
                     return ;
                 }
+            } else {
+                message = message_part.to_message();
             }
 
             if (_pending_responses.contains(message.id)){

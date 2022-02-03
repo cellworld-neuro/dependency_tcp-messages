@@ -26,8 +26,6 @@ namespace tcp_messages {
             this->header = header;
             set_body(body);
             set_id();
-            seq = 0;
-            parts = 1;
         }
         template <class T>
         T get_body() const{
@@ -62,19 +60,31 @@ namespace tcp_messages {
             Add_member(header);
             Add_member(body);
             Add_optional_member(id);
-            Add_optional_member(seq);
-            Add_optional_member(parts);
         });
         void set_id();
         void set_id(const std::string &);
         std::string header;
         std::string body;
         std::string id;
-        int seq;
-        int parts;
     };
 
-    struct Message_parts : json_cpp::Json_vector<Message> {
+    struct Message_part : json_cpp::Json_object {
+        Json_object_members({
+                                Add_member(header);
+                                Add_member(body);
+                                Add_optional_member(id);
+                                Add_optional_member(seq);
+                                Add_optional_member(parts);
+                            });
+        std::string header;
+        std::string body;
+        std::string id;
+        int seq;
+        int parts;
+        Message to_message();
+    };
+
+    struct Message_parts : json_cpp::Json_vector<Message_part> {
         Message_parts() = default;
         explicit Message_parts(const Message &);
         bool is_ready();

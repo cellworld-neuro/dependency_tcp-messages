@@ -19,20 +19,24 @@ namespace tcp_messages {
     }
 
     void Message_service::on_incoming_data(const string &data) {
+        Message_part message_part;
         Message message;
         try {
-            data >> message;
-            if (message.parts > 1) {
-                if (!_partials.contains(message.id)) {
-                    _partials[message.id] = Message_parts();
+            data >> message_part;
+            if (message_part.parts > 1) {
+                if (!_partials.contains(message_part.id)) {
+                    _partials[message_part.id] = Message_parts();
                 }
-                _partials[message.id].push_back(message);
-                if( _partials[message.id].is_ready()) {
-                    message = _partials[message.id].join();
-                    _partials.erase(message.id);
+                _partials[message_part.id].push_back(message_part);
+                if( _partials[message_part.id].is_ready()) {
+                    message = _partials[message_part.id].join();
+                    _partials.erase(message_part.id);
                 } else {
+                    // message not complete yet
                     return ;
                 }
+            } else {
+                message = message_part.to_message();
             }
             if (!route(message)) unrouted_message(message);
         } catch (...) {
@@ -43,6 +47,7 @@ namespace tcp_messages {
     bool Message_service::send_message(const Message &message) {
         Message_parts parts (message);
         for (auto &part:parts) {
+            //cout << "SENDING : " << part.to_json() << endl << endl;
             if (!send_data(part.to_json())) return false;
         }
         return true;

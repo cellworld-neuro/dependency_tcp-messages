@@ -18,8 +18,6 @@ namespace tcp_messages {
     Message::Message(const std::string &header) :
     header(header){
         set_id();
-        seq = 0;
-        parts = 1;
     }
 
     void Message::set_id() {
@@ -32,8 +30,6 @@ namespace tcp_messages {
 
     Message::Message() {
         set_id();
-        seq = 0;
-        parts = 1;
     }
 
     void Manifest::add_route(const std::string &route, const std::string &input_type) {
@@ -56,9 +52,7 @@ namespace tcp_messages {
 
     Message Message_parts::join() {
         if (empty()) return Message();
-        Message joined =(*this)[0];
-        joined.parts = 1;
-        joined.seq = 0;
+        Message joined =(*this)[0].to_message();
         for (unsigned int part_number=1; part_number<size(); part_number++){
             joined.body += (*this)[part_number].body;
         }
@@ -69,5 +63,13 @@ namespace tcp_messages {
         if (empty()) return false;
         if (size()!=(*this)[1].parts) return false;
         return true;
+    }
+
+    Message Message_part::to_message() {
+        Message message;
+        message.id = id;
+        message.body = body;
+        message.header = header;
+        return message;
     }
 }
