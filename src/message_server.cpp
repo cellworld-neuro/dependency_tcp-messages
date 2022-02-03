@@ -47,7 +47,7 @@ namespace tcp_messages {
     bool Message_service::send_message(const Message &message) {
         Message_parts parts (message);
         for (auto &part:parts) {
-            //cout << "SENDING : " << part.to_json() << endl << endl;
+            cout << "SENDING : " << part.to_json().size() << endl << endl;
             if (!send_data(part.to_json())) return false;
         }
         return true;
