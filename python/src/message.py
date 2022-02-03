@@ -5,13 +5,11 @@ from uuid import uuid1
 
 class Message(JsonObject):
 
-    def __init__(self, header: str = "", body="", seq: int = 0, parts: int = 1):
+    def __init__(self, header: str = "", body=""):
         JsonObject.__init__(self)
         self.header = header
         self.body = str(body)
         self.id = str(uuid1())
-        self.seq = seq
-        self.parts = parts
         self._source = None
 
     def get_body(self, body_type: type = None):
@@ -39,3 +37,42 @@ class Message(JsonObject):
             return True
         else:
             return False
+
+
+class MessagePart(JsonObject):
+
+    def __init__(self, header: str = "", body: str = "", message_id: str = "", seq: int = 0, parts: int = 1):
+        self.header = header
+        self.body = body
+        self.id = message_id
+        self.seq = seq
+        self.parts = parts
+
+    def to_message(self) -> Message:
+        message = Message(header=self.header, body=self.body)
+        message.id = self.id
+        return message
+
+
+class MessageParts(JsonList):
+
+    def __init__(self, message: Message = None):
+        JsonList.__init__(self, None, list_type=MessagePart)
+        if message:
+            parts = (len(message.body) // 1024) + 1
+            for i in range(parts):
+                part = MessagePart(header=message.header, body=message.body[i*1024:(i+1)*1024], message_id=message.id, seq=i, parts=parts)
+                self.append(part)
+
+    def join(self) -> Message:
+        if len(self) == 0:
+            return Message()
+        message = self[0].to_message()
+        for i in range(1, len(self)):
+            message.body += self[i].body
+        return message
+
+    def is_ready(self) -> bool:
+        if len(self) == 0:
+            return False
+        return self[0].parts == len(self)

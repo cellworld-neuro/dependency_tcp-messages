@@ -1,5 +1,5 @@
 from .message_list import MessageList
-from .message import Message
+from .message import Message, MessageParts, MessagePart
 import socket
 
 
@@ -15,6 +15,7 @@ class Connection:
         self.failed_message = failed_message
         self.pending_messages = MessageList()
         self.state = None
+        self.partials = dict()
         self.peek()
 
     def close(self):
@@ -22,10 +23,14 @@ class Connection:
         self.state = Connection.State.Close
 
     def send(self, message: Message) -> bool:
-        message_str = str(message)
-        message_bytes = message_str.encode()
-        message_bytes += b'\x00'
-        return self.socket.send(message_bytes) == len(message_bytes)
+        message_parts = MessageParts(message)
+        for part in message_parts:
+            message_str = str(part)
+            message_bytes = message_str.encode()
+            message_bytes += b'\x00'
+            if self.socket.send(message_bytes) != len(message_bytes):
+                return False
+        return True
 
     def peek(self):
         try:
@@ -63,8 +68,16 @@ class Connection:
                 for message_str in messages_str:
                     if message_str:
                         try:
-                            message = Message.parse(message_str) # creates a new message instance
-                            self.pending_messages.queue(message)
+                            message_part = MessagePart.parse(message_str) # creates a new message instance
+                            if message_part.parts <= 1:
+                                self.pending_messages.queue(message_part.to_message())
+                            else:
+                                if message_part.id not in self.partials:
+                                    self.partials[message_part.id] = MessageParts()
+                                self.partials[message_part.id].append(message_part)
+                                if self.partials[message_part.id].is_ready():
+                                    self.pending_messages.queue(self.partials[message_part.id].join())
+                                    del self.partials[message_part.id]
                         except:
                             if self.failed_message:
                                 self.failed_message(message_str)
