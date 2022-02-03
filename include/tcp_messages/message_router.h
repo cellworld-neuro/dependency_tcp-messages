@@ -54,12 +54,17 @@ namespace tcp_messages {
     }                                                                     \
 }
 
+#define Allow_subscription() \
+    Add_route_with_response("!subscribe", _subscribe);                                  \
+    Add_route_with_response("!unsubscribe", _unsubscribe);                              \
 
 #define Routes(ADD_ROUTES) bool route(const tcp_messages::Message &message) override { \
     tcp_messages::Manifest manifest;                                                   \
     bool routed = false;                                                               \
     ADD_ROUTES;                                                                        \
     Add_route_with_response("!manifest", [manifest](){return manifest;});              \
-    Add_route_with_response("!subscribe", subscribe);                                  \
+    if (!routed) {                                                                     \
+        Add_route_with_response("!(.*)", [](){return false;});                             \
+    }                                                                                  \
     return routed;                                                                     \
 }

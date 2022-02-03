@@ -50,8 +50,19 @@ class MessageServer:
     def __subscribe_connection_fail__(self, message: Message):
         return False
 
+    def __unsubscribe_connection_fail__(self, message: Message):
+        return False
+
     def __subscribe_connection__(self, message: Message):
+        if message._source in self.subscriptions:
+            return False
         self.subscriptions.append(message._source)
+        return True
+
+    def __unsubscribe_connection__(self, message: Message):
+        if message._source not in self.subscriptions:
+            return False
+        self.subscriptions.remove(message._source)
         return True
 
     def start(self, port: int):
@@ -60,8 +71,10 @@ class MessageServer:
         self.server.settimeout(0.001)
         if self.allow_subscription:
             self.router.add_route("!subscribe", self.__subscribe_connection__)
+            self.router.add_route("!unsubscribe", self.__unsubscribe_connection__)
         else:
             self.router.add_route("!subscribe", self.__subscribe_connection_fail__)
+            self.router.add_route("!unsubscribe", self.__unsubscribe_connection_fail__)
         self.thread.start()
         while not self.running:
             pass
