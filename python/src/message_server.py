@@ -67,7 +67,10 @@ class MessageServer:
 
     def start(self, port: int):
         self.server.bind((self.ip, port))
-        self.server.listen()
+        try:
+            self.server.listen()
+        except socket.error as err:
+            return False
         self.server.settimeout(0.001)
         if self.allow_subscription:
             self.router.add_route("!subscribe", self.__subscribe_connection__)

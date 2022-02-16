@@ -26,7 +26,10 @@ class MessageClient:
         self.ip = ip
         self.port = port
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((self.ip, self.port))
+        try:
+            s.connect((self.ip, self.port))
+        except socket.error as msg:
+            return False
         self.connection = Connection(s, self.failed_messages)
         self.router.attend(self.connection)
 
