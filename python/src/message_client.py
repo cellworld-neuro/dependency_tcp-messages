@@ -32,6 +32,7 @@ class MessageClient:
             return False
         self.connection = Connection(s, self.failed_messages)
         self.router.attend(self.connection)
+        return True
 
     def send_request(self, message: Message, time_out: int = 500) -> Message:
         event = MessageEvent()

@@ -81,6 +81,7 @@ class MessageServer:
         self.thread.start()
         while not self.running:
             pass
+        return True
 
     def stop(self):
         if self.running:
