@@ -16,9 +16,9 @@ namespace tcp_messages{
 
     Message Message_client::send_request(const Message &request, int time_out) {
         Message_event event;
-        //messages.add_message_event(request.id, event);
         _pending_responses.insert(std::pair<std::string,Message_event &>(request.id, event));
-        if (!send_message(request)) throw "failed to send the request to server.";
+        if (!send_message(request)) throw std::runtime_error("failed to send the request to server.");
+        if (time_out < 0) time_out = _request_time_out;
         return event.wait(time_out);
     }
 
@@ -109,5 +109,9 @@ namespace tcp_messages{
 
     bool Message_client::subscribe() {
         return send_request(Message("!subscribe")).get_body<bool>();
+    }
+
+    void Message_client::set_request_time_out(int time_out) {
+        _request_time_out = time_out;
     }
 }

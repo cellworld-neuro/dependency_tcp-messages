@@ -15,13 +15,16 @@ namespace tcp_messages {
         bool subscribe();
         bool contains(const std::string &header);
         bool send_message(const Message &);
-        Message send_request(const Message &request, int time_out = 500);
+        Message send_request(const Message &request, int time_out = -1);
         void send_async_request(const Message &request, void (*call_back)(Response_type));
         Manifest get_manifest();
         Message get_message (const std::string &header);
         Message get_last_message (const std::string &header);
+        void set_request_time_out(int);
         Message_list messages;
         std::map<std::string,Message_event &> _pending_responses;
         std::map<std::string, Message_parts> _partials;
+    private:
+        int _request_time_out = 500;
     };
 }
