@@ -24,6 +24,7 @@ namespace tcp_messages {
     protected:
         bool _subscribe();
         bool _unsubscribe();
+        std::mutex _sending_message;
     };
 
     template<class T>
@@ -36,20 +37,33 @@ namespace tcp_messages {
         void broadcast(const Message &message) {
             for (auto client:this->clients){
                 if (client->connection->state == easy_tcp::Connection_state::Open){
-                    try{
-                        client->send_message(message);
-                    } catch (...)
-                    {}
+                    std::thread([](T *client, Message message){
+                        try{
+                            if (!client->send_message(message)){
+                                client->connection->state = easy_tcp::Connection_state::Error;
+                            }
+                        } catch (...)
+                        {
+                            client->connection->state = easy_tcp::Connection_state::Error;
+                        }
+                    }, client, message).detach();
+
                 }
             }
         }
         void broadcast_subscribed(const Message &message) {
             for (auto client:this->clients){
                 if (client->connection->state == easy_tcp::Connection_state::Open && client->_subscribed){
-                    try{
-                        client->send_message(message);
-                    } catch (...)
-                    {}
+                    std::thread([](T *client, Message message){
+                        try{
+                            if (!client->send_message(message)){
+                                client->connection->state = easy_tcp::Connection_state::Error;
+                            }
+                        } catch (...)
+                        {
+                            client->connection->state = easy_tcp::Connection_state::Error;
+                        }
+                    }, client, message).detach();
                 }
             }
         }

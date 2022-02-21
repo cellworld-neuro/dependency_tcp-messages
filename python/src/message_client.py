@@ -18,6 +18,7 @@ class MessageClient:
         self.port = 0
         self.messages = MessageList()
         self.connection = None
+        self._request_time_out = 500
 
     def __unrouted__(self, message: Message):
         self.messages.queue(message)
@@ -34,14 +35,19 @@ class MessageClient:
         self.router.attend(self.connection)
         return True
 
-    def send_request(self, message: Message, time_out: int = 500) -> Message:
+    def send_request(self, message: Message, time_out: int = -1) -> Message:
         event = MessageEvent()
         self.router.add_message_event(request_id=message.id, event=event)
+        if time_out < 0:
+            time_out = self._request_time_out
         self.send_message(message)
         response = event.wait(time_out)
         if response:
             return response
         raise TimeoutError("the request has timed_out")
+
+    def set_request_time_out(self, time_out: int):
+        self._request_time_out = time_out
 
     def send_async_request(self, message: Message, call_back):
         event = MessageEvent(call_back=call_back)
