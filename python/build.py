@@ -11,13 +11,16 @@ if build:
 	print('build succeded')
 	if '-upload' in sys.argv:
 		import os
-		if '-user':
+		username = ""
+		if '-user' in sys.argv:
 			username = sys.argv[sys.argv.index('-user')+1]
-		if '-password':
+		password = ""
+		if '-password' in sys.argv:
 			password = sys.argv[sys.argv.index('-password')+1]
-		if '-repository':
+		repository = ""
+		if '-repository' in sys.argv:
 			repository = sys.argv[sys.argv.index('-repository')+1]
-		os.system('cd ' + build + '; twine upload dist/*' + ((' --repository-url  ' + repository) if username else '') + ((' -u ' + username) if username else '') + ((' -p ' + password) if password else ''))
+		os.system('cd ' + build + '; twine upload dist/*' + ((' --repository-url  ' + repository) if repository else '') + ((' -u ' + username) if username else '') + ((' -p ' + password) if password else ''))
 	else:
 		print('use twine upload --repository-url [pypi-repository-url] dist/* to upload the package')
 	if '-install' in sys.argv:
