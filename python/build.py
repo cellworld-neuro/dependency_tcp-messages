@@ -1,3 +1,4 @@
+#!/bin/python3
 import sys
 from easy_pack import EasyPackModule
 from os import path
