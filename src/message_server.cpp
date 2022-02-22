@@ -45,15 +45,15 @@ namespace tcp_messages {
     }
 
     bool Message_service::send_message(const Message &message) {
-        _sending_message.lock();
+        //_sending_message.lock();
         Message_parts parts (message);
         for (auto &part:parts) {
             if (!send_data(part.to_json())) {
-                _sending_message.unlock();
+                //_sending_message.unlock();
                 return false;
             }
         }
-        _sending_message.unlock();
+        //_sending_message.unlock();
         return true;
     }
 
