@@ -21,7 +21,7 @@ namespace tcp_messages {
     void Message_service::on_incoming_data(const string &data) {
         Message_part message_part;
         Message message;
-//        try {
+        try {
             data >> message_part;
             if (message_part.parts > 1) {
                 if (!_partials.contains(message_part.id)) {
@@ -39,9 +39,9 @@ namespace tcp_messages {
                 message = message_part.to_message();
             }
             if (!route(message)) unrouted_message(message);
-//        } catch (...) {
-//            failed_message(data);
-//        }
+        } catch (...) {
+            failed_message(data);
+        }
     }
 
     bool Message_service::send_message(const Message &message) {
