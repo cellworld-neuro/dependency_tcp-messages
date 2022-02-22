@@ -24,7 +24,7 @@ namespace tcp_messages {
     protected:
         bool _subscribe();
         bool _unsubscribe();
-        std::mutex _sending_message;
+        //std::mutex _sending_message;
     };
 
     template<class T>
