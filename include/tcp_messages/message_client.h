@@ -13,6 +13,7 @@ namespace tcp_messages {
         void received_data(const std::string &) override;
         virtual void failed_message(const std::string &);
         bool subscribe();
+        bool unsubscribe();
         bool contains(const std::string &header);
         bool send_message(const Message &);
         Message send_request(const Message &request, int time_out = -1);

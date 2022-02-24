@@ -111,6 +111,10 @@ namespace tcp_messages{
         return send_request(Message("!subscribe")).get_body<bool>();
     }
 
+    bool Message_client::unsubscribe() {
+        return send_request(Message("!unsubscribe")).get_body<bool>();
+    }
+
     void Message_client::set_request_time_out(int time_out) {
         _request_time_out = time_out;
     }
