@@ -46,6 +46,8 @@ class Router:
             return responses
         if message.header == "!manifest":
             responses.append(self.get_manifest())
+        if message.header == "!ping":
+            responses.append(True)
         for pattern in self.routes.keys():
             if re.search(pattern, message.header):
                 (handler, body_type) = self.routes[pattern]

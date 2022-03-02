@@ -62,6 +62,7 @@ namespace tcp_messages {
     tcp_messages::Manifest manifest;                                                   \
     bool routed = false;                                                               \
     ADD_ROUTES;                                                                        \
+    Add_route_with_response("!ping", [](){return true;});              \
     Add_route_with_response("!manifest", [manifest](){return manifest;});              \
     if (!routed) {                                                                     \
         Add_route_with_response("!(.*)", [](){return false;});                             \
