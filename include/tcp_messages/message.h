@@ -70,6 +70,7 @@ namespace tcp_messages {
 
     struct Message_part : json_cpp::Json_object {
         Json_object_members({
+                                Case_insensitive();
                                 Add_member(header);
                                 Add_member(body);
                                 Add_optional_member(id);
