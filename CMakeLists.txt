@@ -23,10 +23,13 @@ add_library(tcp_messages ${tcp_messages_files})
 
 install_git_dependency(Json-cpp https://github.com/germanespinosa/json-cpp
         CMAKE_PROJECT
-        CONNECTED)
+        CONNECTED
+        TARGET tcp_messages)
+
 install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp
         CMAKE_PROJECT
-        CONNECTED)
+        CONNECTED
+        TARGET tcp_messages)
 
 set_target_properties(tcp_messages
         PROPERTIES
