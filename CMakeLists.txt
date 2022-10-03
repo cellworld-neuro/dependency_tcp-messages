@@ -9,9 +9,6 @@ project(tcp_messages
 
 find_package(Dependencies)
 
-install_dependency(https://github.com/germanespinosa/json-cpp Json-cpp)
-install_dependency(https://github.com/germanespinosa/easy-tcp Easy-tcp)
-
 string(APPEND CMAKE_CXX_FLAGS " -fno-strict-aliasing -pthread ")
 
 set (tcp_messages_files
@@ -23,6 +20,9 @@ set (tcp_messages_files
         src/message_list.cpp)
 
 add_library(tcp_messages ${tcp_messages_files})
+
+install_git_dependency(Json-cpp https://github.com/germanespinosa/json-cpp )
+install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp)
 
 set_target_properties(tcp_messages
         PROPERTIES
@@ -37,8 +37,8 @@ else(MSVC)
     add_compile_options(-Wall -Wextra -pedantic)
 endif(MSVC)
 
-dependency_include(include)
-dependency_include(${dependencies_folder}/easy-tcp/include)
+include_directories(include)
+include_directories(${dependencies_folder}/easy-tcp/include)
 
 target_include_directories(tcp_messages
         SYSTEM INTERFACE
@@ -58,12 +58,12 @@ target_link_libraries(tcp_messages
 #### TESTS
 ####
 
-install_dependency(https://github.com/germanespinosa/catch CatchTests)
-
-test_library(tcp_messages catchtests/message.cpp)
-
-test_library(tcp_messages catchtests/long_message.cpp)
-
+#install_dependency(https://github.com/germanespinosa/catch CatchTests)
+#
+#test_library(tcp_messages catchtests/message.cpp)
+#
+#test_library(tcp_messages catchtests/long_message.cpp)
+#
 
 ###
 ### LIBRARY INSTALLATION
