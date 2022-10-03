@@ -32,7 +32,8 @@ add_library(tcp_messages ${tcp_messages_files})
 install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp
         CMAKE_PROJECT
         CONNECTED
-        TARGET tcp_messages)
+        TARGET tcp_messages
+        INCLUDE_DIRECTORIES include)
 
 set_target_properties(tcp_messages
         PROPERTIES
@@ -48,7 +49,6 @@ else(MSVC)
 endif(MSVC)
 
 include_directories(include)
-include_directories(${dependencies_folder}/easy-tcp/include)
 
 target_include_directories(tcp_messages
         SYSTEM INTERFACE
