@@ -19,12 +19,15 @@ set (tcp_messages_files
         src/message_event.cpp
         src/message_list.cpp)
 
-add_library(tcp_messages ${tcp_messages_files})
-
-install_git_dependency(Json-cpp https://github.com/germanespinosa/json-cpp
+install_git_dependency(Json-cpp
+        https://github.com/germanespinosa/json-cpp
+        PRIVATE
         CMAKE_PROJECT
-        CONNECTED
-        TARGET tcp_messages)
+        IMPORT_TARGETS
+        json-cpp
+        CONNECTED)
+
+add_library(tcp_messages ${tcp_messages_files})
 
 install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp
         CMAKE_PROJECT
