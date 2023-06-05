@@ -4,17 +4,17 @@
 #include <tcp_messages/message.h>
 #include <regex>
 
-#define Add_route(HEADER, DESTINATION, ...) { \
-    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                       \
-    if (std::regex_match (message.header,std::regex(HEADER))) {           \
-        routed = true;                                                    \
-        try {                                                             \
-                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)\
-                DESTINATION(__VA_OPT__(request));                         \
-        } catch (...) {                                                   \
-            failed_route(message);                                        \
-        }                                                                 \
-    }                                                                     \
+#define Add_route(HEADER, DESTINATION, ...) {                               \
+    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                   \
+    if (std::regex_match (message.header,std::regex(HEADER))) {             \
+        routed = true;                                                      \
+        try {                                                               \
+                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();) \
+                DESTINATION(__VA_OPT__(request));                           \
+        } catch (...) {                                                     \
+            failed_route(message);                                          \
+        }                                                                   \
+    }                                                                       \
 }
 
 namespace tcp_messages {
@@ -40,18 +40,18 @@ namespace tcp_messages {
     }
 }
 
-#define Add_route_with_response(HEADER, DESTINATION, ...) { \
-    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                       \
-    if (std::regex_match (message.header,std::regex(HEADER))) {           \
-        routed = true;                                                    \
-        try {                                                             \
-                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)\
-                auto response = DESTINATION(__VA_OPT__(request)); \
-                send_message(tcp_messages::get_response(message, response));         \
-        } catch (...) {                                                   \
-            failed_route(message);                                        \
-        }                                                                 \
-    }                                                                     \
+#define Add_route_with_response(HEADER, DESTINATION, ...) {                  \
+    manifest.add_route(HEADER __VA_OPT__(,#__VA_ARGS__));                    \
+    if (std::regex_match (message.header,std::regex(HEADER))) {              \
+        routed = true;                                                       \
+        try {                                                                \
+                __VA_OPT__(auto request = message.get_body<__VA_ARGS__>();)  \
+                auto response = DESTINATION(__VA_OPT__(request));            \
+                send_message(tcp_messages::get_response(message, response)); \
+        } catch (...) {                                                      \
+            failed_route(message);                                           \
+        }                                                                    \
+    }                                                                        \
 }
 
 #define Allow_subscription() \
@@ -65,7 +65,7 @@ namespace tcp_messages {
     Add_route_with_response("!ping", [](){return true;});              \
     Add_route_with_response("!manifest", [manifest](){return manifest;});              \
     if (!routed) {                                                                     \
-        Add_route_with_response("!(.*)", [](){return false;});                             \
+        Add_route_with_response("!(.*)", [](){return false;});                         \
     }                                                                                  \
     return routed;                                                                     \
 }
