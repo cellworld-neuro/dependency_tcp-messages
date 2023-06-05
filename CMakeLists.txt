@@ -48,7 +48,7 @@ add_library(tcp_messages ${tcp_messages_files})
 install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp
         CMAKE_PROJECT
         CONNECTED
-        TARGET tcp_messages
+        IMPORT_TARGETS easy-tcp
         INCLUDE_DIRECTORIES include)
 
 set_target_properties(tcp_messages
@@ -84,12 +84,22 @@ target_link_libraries(tcp_messages
 #### TESTS
 ####
 
-#install_dependency(https://github.com/germanespinosa/catch CatchTests)
-#
+install_git_dependency(CatchTests
+        https://github.com/germanespinosa/catch
+        ADD_SUBDIRECTORY)
+
+add_catch_test( message_test
+        SOURCE_FILES catchtests/message.cpp
+        LINK_LIBRARIES tcp_messages easy-tcp)
+
+add_catch_test( long_message_test
+        SOURCE_FILES catchtests/long_message.cpp
+        LINK_LIBRARIES tcp_messages easy-tcp)
+
 #test_library(tcp_messages catchtests/message.cpp)
 #
 #test_library(tcp_messages catchtests/long_message.cpp)
-#
+
 
 ###
 ### LIBRARY INSTALLATION
