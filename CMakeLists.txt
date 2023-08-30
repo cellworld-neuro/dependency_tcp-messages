@@ -36,7 +36,7 @@ set (tcp_messages_files
         src/message_list.cpp)
 
 install_git_dependency(Json-cpp
-        https://github.com/germanespinosa/json-cpp
+        https://github.com/cellworld/dependency_json-cpp
         PRIVATE
         CMAKE_PROJECT
         IMPORT_TARGETS
@@ -45,7 +45,7 @@ install_git_dependency(Json-cpp
 
 add_library(tcp_messages ${tcp_messages_files})
 
-install_git_dependency(Easy-tcp https://github.com/germanespinosa/easy-tcp
+install_git_dependency(Easy-tcp https://github.com/cellworld/dependency_easy-tcp
         CMAKE_PROJECT
         CONNECTED
         IMPORT_TARGETS easy-tcp
@@ -85,7 +85,7 @@ target_link_libraries(tcp_messages
 ####
 
 install_git_dependency(CatchTests
-        https://github.com/germanespinosa/catch
+        https://github.com/cellworld/dependency_catch
         ADD_SUBDIRECTORY)
 
 add_catch_test( message_test
@@ -95,11 +95,6 @@ add_catch_test( message_test
 add_catch_test( long_message_test
         SOURCE_FILES catchtests/long_message.cpp
         LINK_LIBRARIES tcp_messages easy-tcp)
-
-#test_library(tcp_messages catchtests/message.cpp)
-#
-#test_library(tcp_messages catchtests/long_message.cpp)
-
 
 ###
 ### LIBRARY INSTALLATION
