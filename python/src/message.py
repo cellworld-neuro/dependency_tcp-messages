@@ -57,7 +57,7 @@ class MessagePart(JsonObject):
 class MessageParts(JsonList):
 
     def __init__(self, message: Message = None):
-        JsonList.__init__(self, None, list_type=MessagePart)
+        JsonList.__init__(self, list_type=MessagePart)
         if message:
             parts = (len(message.body) // 1024) + 1
             for i in range(parts):
