@@ -5,7 +5,7 @@ from .message_event import MessageEvent
 
 class MessageList(JsonList):
     def __init__(self, iterable=None):
-        JsonList.__init__(self, iterable, list_type=Message)
+        JsonList.__init__(self, iterable=iterable, list_type=Message)
         self.pending_responses = dict()
 
     def queue(self, message: Message):

@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 36 
+	return 1, 0, 38 
 
 
 def __module_name__():
@@ -60,5 +60,9 @@ def __root_folder__():
 
 def __description__():
 	return 'create json services easily' 
+
+
+def __package_data__():
+	return {} 
 
 
