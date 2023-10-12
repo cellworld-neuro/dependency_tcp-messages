@@ -8,6 +8,7 @@ class MyService:
 
     def __init__(self):
         self.value = 0
+        self.list = JsonList(int)
 
     def method1(self, v: int):
         print("method1")
@@ -26,11 +27,15 @@ class MyService:
     def method4(self, v: int):
         print("method4")
         self.value += v
+        self.list.append(v)
 
     def method5(self, i: int, f: float, s: string):
         print("method4 %i, %f, %s" % (i, f, s))
         return "method4 %i, %f, %s" % (i, f, s)
 
+    def method6(self):
+        print("hello")
+        return self.list
 
 # server = MessageServer()
 # server.router.add_route("int_value", lambda m: randint(0, 100))

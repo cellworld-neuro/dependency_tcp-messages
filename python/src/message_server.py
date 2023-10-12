@@ -137,19 +137,22 @@ class MessageServiceServer(MessageServer):
         self.sessions_enabled = enable_sessions
         methods = [c for c in dir(service_class) if c[0] != "_"]
         if not self.sessions_enabled:
-            self._service_object = service_class()
+            self.service_object = service_class()
             for method in methods:
-                self.router.add_route(method, getattr(self._service_object, method), Router.Parse)
+                self.router.add_route(method, getattr(self.service_object, method), Router.Parse)
         else:
             self.on_new_connection = self.__new_session__
             for method in methods:
                 self.router.add_route(method, MessageServiceServer.__handler__, Router.Complete)
 
     def __new_session__(self, client_connection):
-        client_connection._service_object = self.service_class()
-        client_connection._service_object.server = self
+        client_connection.service_object = self.service_class()
+        client_connection.service_object.server = self
 
-    def __handler__(message, connection):
-        method = getattr(connection._service_object, message.header)
-        d = JsonObject.load(message.body).to_dict()
-        return method(**d)
+    def __handler__(message, client_connection):
+        method = getattr(client_connection.service_object, message.header)
+        if message.body:
+            d = JsonObject.load(message.body).to_dict()
+            return method(**d)
+        else:
+            return method()
