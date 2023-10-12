@@ -1,22 +1,49 @@
-from src import MessageServer
+from src import MessageServer, MessageServiceServer
 from json_cpp import JsonObject, JsonList
 from random import randint, random, choice
 import string
 
 
-def new_connection(p = None):
-    print ("New connection")
+class MyService:
+
+    def __init__(self):
+        self.value = 0
+
+    def method1(self, v: int):
+        print("method1")
+        self.value += v
+        return self.value
+
+    def method2(self, v: int):
+        print("method2")
+        self.value -= v
+        return self.value
+
+    def method3(self, v1: str, v2: str):
+        print("method3")
+        return v1 + v2
+
+    def method4(self, v: int):
+        print("method4")
+        self.value += v
+
+    def method5(self, i: int, f: float, s: string):
+        print("method4 %i, %f, %s" % (i, f, s))
+        return "method4 %i, %f, %s" % (i, f, s)
 
 
-server = MessageServer()
-server.router.add_route("int_value", lambda m: randint(0, 100))
-server.router.add_route("float_value", lambda m: random())
-server.router.add_route("string_value", lambda m: ''.join(choice(string.ascii_lowercase) for i in range(10000)))
-server.router.add_route("JsonObject_value", lambda m: JsonObject(v0=randint(0, 100), v1=random(), v2=JsonObject(v3="string value")))
-server.router.add_route("JsonList_value", lambda m: JsonList(iterable=["1", 2, JsonObject(a=2), 4]))
-server.router.add_route("stop", lambda m: server.stop())
+# server = MessageServer()
+# server.router.add_route("int_value", lambda m: randint(0, 100))
+# server.router.add_route("float_value", lambda m: random())
+# server.router.add_route("string_value", lambda m: ''.join(choice(string.ascii_lowercase) for i in range(10000)))
+# server.router.add_route("JsonObject_value", lambda m: JsonObject(v0=randint(0, 100), v1=random(), v2=JsonObject(v3="string value")))
+# server.router.add_route("JsonList_value", lambda m: JsonList(iterable=["1", 2, JsonObject(a=2), 4]))
+# server.router.add_route("parse_sum", lambda a=0, b=0: a + b)
+# server.router.add_route("stop", server.stop)
+
+server = MessageServiceServer(MyService, True)
+print(dir(server))
 server.start(port=6500) #service starts listening on port 6500
-server.on_new_connection = new_connection
 print("server is running")
 server.join()
 

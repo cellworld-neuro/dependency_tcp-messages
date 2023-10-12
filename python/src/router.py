@@ -9,6 +9,12 @@ from json_cpp import JsonList, JsonObject
 
 
 class Router:
+    Empty = 0
+    Message = 1
+    Body = 2
+    Parse = 3
+    Complete = 4
+
     def __init__(self):
         self.routes = {}
         self.failed_message = None
@@ -24,7 +30,17 @@ class Router:
         return True
 
     def add_route(self, pattern: str, handler, body_type=None):
-        check_type(handler, (types.FunctionType, types.MethodType), "incorrect type for handler")
+        if not callable(handler):
+            raise RuntimeError ("incorrect type for handler")
+        if body_type is None:
+            from inspect import signature
+            s = signature(handler)
+            if len(s.parameters) == 0:
+                body_type = Router.Empty
+            elif len(s.parameters) == 1:
+                body_type = Router.Message
+            elif len(s.parameters) > 1:
+                body_type = Router.Parse
         self.routes[pattern] = (handler, body_type)
 
     def get_manifest(self):
@@ -38,7 +54,7 @@ class Router:
             manifest.append(JsonObject(route=pattern, input_type=body_type_str))
         return manifest
 
-    def route(self, message: Message):
+    def route(self, message: Message, connection: Connection):
         responses = []
         check_type(message, Message, "incorrect type for message")
         if message.id in self.pending_responses:
@@ -52,10 +68,19 @@ class Router:
             if re.search(pattern, message.header):
                 (handler, body_type) = self.routes[pattern]
                 try:
-                    if body_type:
-                        responses.append(handler(message.get_body(body_type)))
-                    else:
+                    if body_type == Router.Empty:
+                        responses.append(handler())
+                    elif body_type == Router.Message:
                         responses.append(handler(message))
+                    elif body_type == Router.Body:
+                        responses.append(handler(message.body))
+                    elif body_type == Router.Parse:
+                        params = JsonObject.load(message.body).to_dict()
+                        responses.append(handler(**params))
+                    elif body_type == Router.Complete:
+                        responses.append(handler(message, connection))
+                    else:
+                        responses.append(handler(message.get_body(body_type)))
                 except:
                     if self.failed_route:
                         self.failed_route(message)
@@ -97,7 +122,7 @@ class RouterProcess:
     @staticmethod
     def __incoming_message__(connection: Connection, router: Router, message: Message):
         message._source = connection
-        responses = router.route(message)
+        responses = router.route(message, connection)
         if responses:
             for response in responses:
                 if isinstance(response, Message):

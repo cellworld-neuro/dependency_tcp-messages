@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 39 
+	return 1, 0, 43 
 
 
 def __module_name__():
@@ -19,7 +19,7 @@ def __package_description__():
 
 
 def __install_requires__():
-	return ['json-cpp'] 
+	return ['json-cpp>=1.0.78'] 
 
 
 def __url__():
@@ -46,6 +46,10 @@ def __files__():
 	return ['message_client.py', 'connection.py', 'message.py', 'message_list.py', 'router.py', 'message_server.py', 'util.py', 'message_event.py'] 
 
 
+def __additional_files__():
+	return [] 
+
+
 def __setup_py__():
 	return '../setup/setup.py' 
 
@@ -60,9 +64,5 @@ def __root_folder__():
 
 def __description__():
 	return 'create json services easily' 
-
-
-def __package_data__():
-	return {} 
 
 

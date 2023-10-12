@@ -3,11 +3,15 @@ import json
 from json_cpp import JsonObject, JsonList
 from uuid import uuid1
 
+
+
 class Message(JsonObject):
 
-    def __init__(self, header: str = "", body=""):
+    def __init__(self, header="", body="", **kwargs):
         JsonObject.__init__(self)
         self.header = header
+        if not body and kwargs:
+            body = JsonObject.load(json_dictionary_or_list=kwargs)
         self.body = str(body)
         self.id = str(uuid1())
         self._source = None

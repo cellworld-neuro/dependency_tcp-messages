@@ -35,11 +35,29 @@ class MessageClient:
         self.router.attend(self.connection)
         return True
 
-    def send_request(self, message: Message, time_out: int = -1) -> Message:
+    def send_request(self, message: Message, *args, **kwargs) -> Message:
+        time_out = self._request_time_out
+        if "time_out" in kwargs:
+            time_out = kwargs["time_out"]
+            kwargs.pop("time_out")
+        if isinstance(message, Message):
+            if args:
+                if isinstance(args[0],int):
+                    time_out = args[0]
+                else:
+                    raise RuntimeError("Wrong parameters")
+        elif isinstance(message, str):
+            if args:
+                message = Message(message, args[0])
+            else:
+                if kwargs:
+                    message = Message(message, **kwargs)
+                else:
+                    message = Message(message)
+        else:
+            raise RuntimeError("Wrong parameters")
         event = MessageEvent()
         self.router.add_message_event(request_id=message.id, event=event)
-        if time_out < 0:
-            time_out = self._request_time_out
         self.send_message(message)
         response = event.wait(time_out)
         if response:
@@ -49,7 +67,31 @@ class MessageClient:
     def set_request_time_out(self, time_out: int):
         self._request_time_out = time_out
 
-    def send_async_request(self, message: Message, call_back):
+    def send_async_request(self, message: Message, *args, **kwargs):
+        call_back = None
+        if "call_back" in kwargs:
+            if callable(kwargs["call_back"]):
+                call_back = kwargs["call_back"]
+            else:
+                raise RuntimeError("Wrong parameters")
+            kwargs.pop("call_back")
+        if isinstance(message, Message):
+            if args:
+                if callable(args[0]):
+                    call_back = args[0]
+                else:
+                    raise RuntimeError("Wrong parameters")
+        elif isinstance(message, str):
+            if args:
+                message = Message(message, args[0])
+            else:
+                if kwargs:
+                    message = Message(message, **kwargs)
+                else:
+                    message = Message(message)
+        else:
+            raise RuntimeError("Wrong parameters")
+
         event = MessageEvent(call_back=call_back)
         self.router.add_message_event(request_id=message.id, event=event)
         self.send_message(message)
@@ -63,7 +105,15 @@ class MessageClient:
     def unsubscribe(self):
         return self.send_request(Message("!unsubscribe")).body == "success"
 
-    def send_message(self, message: Message):
+    def send_message(self, message: Message, *args, **kwargs):
+        if isinstance(message, str):
+            if args:
+                message = Message(message, args[0])
+            else:
+                if kwargs:
+                    message = Message(message, **kwargs)
+                else:
+                    message = Message(message)
         self.connection.send(message)
 
     def disconnect(self):

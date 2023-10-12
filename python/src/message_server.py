@@ -4,6 +4,8 @@ from .connection import Connection
 from .router import Router
 from .message import Message
 from .message_list import MessageList
+from json_cpp import JsonObject
+
 
 
 class MessageServer:
@@ -124,3 +126,29 @@ class MessageServer:
                 self.thread.join()
             finally:
                 return False
+
+
+class MessageServiceServer(MessageServer):
+
+    def __init__(self, service_class: type, enable_sessions: bool = False, ip: str = "0.0.0.0"):
+        MessageServer.__init__(self, ip=ip)
+        self.service_class = service_class
+
+        self.sessions_enabled = enable_sessions
+        methods = [c for c in dir(service_class) if c[0] != "_"]
+        if not self.sessions_enabled:
+            self._service_object = service_class()
+            for method in methods:
+                self.router.add_route(method, getattr(self._service_object, method), Router.Parse)
+        else:
+            self.on_new_connection = self.__new_session__
+            for method in methods:
+                self.router.add_route(method, self.__handler__, Router.Complete)
+
+    def __new_session__(self, client_connection):
+        client_connection._service_object = self.service_class()
+
+    def __handler__(self, message, connection):
+        method = getattr(connection._service_object, message.header)
+        d = JsonObject.load(message.body).to_dict()
+        return method(**d)
