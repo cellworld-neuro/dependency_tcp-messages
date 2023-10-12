@@ -143,12 +143,13 @@ class MessageServiceServer(MessageServer):
         else:
             self.on_new_connection = self.__new_session__
             for method in methods:
-                self.router.add_route(method, self.__handler__, Router.Complete)
+                self.router.add_route(method, MessageServiceServer.__handler__, Router.Complete)
 
     def __new_session__(self, client_connection):
         client_connection._service_object = self.service_class()
+        client_connection._service_object.server = self
 
-    def __handler__(self, message, connection):
+    def __handler__(message, connection):
         method = getattr(connection._service_object, message.header)
         d = JsonObject.load(message.body).to_dict()
         return method(**d)
