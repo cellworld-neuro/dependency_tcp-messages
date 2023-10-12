@@ -1,5 +1,5 @@
 def __module_version__():
-	return 1, 0, 44 
+	return 1, 0, 46 
 
 
 def __module_name__():
@@ -19,7 +19,7 @@ def __package_description__():
 
 
 def __install_requires__():
-	return ['json-cpp>=1.0.78'] 
+	return ['json-cpp>=1.0.85'] 
 
 
 def __url__():

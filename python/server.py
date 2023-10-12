@@ -1,7 +1,8 @@
 from src import MessageServer, MessageServiceServer
-from json_cpp import JsonObject, JsonList
+from json_cpp import JsonObject, JsonList, json_force_parameter_type
 from random import randint, random, choice
 import string
+from cellworld import Coordinates, Coordinates_list
 
 
 class MyService:
@@ -37,6 +38,19 @@ class MyService:
         print("hello")
         return self.list
 
+    @json_force_parameter_type
+    def method7(self, c: Coordinates):
+        c.x += 1
+        c.y += 1
+        return c
+
+    @json_force_parameter_type
+    def method8(self, cl: Coordinates_list):
+        cl.append(Coordinates(10,10))
+        cl.append(Coordinates(10,10))
+        return cl
+
+
 # server = MessageServer()
 # server.router.add_route("int_value", lambda m: randint(0, 100))
 # server.router.add_route("float_value", lambda m: random())
@@ -47,7 +61,6 @@ class MyService:
 # server.router.add_route("stop", server.stop)
 
 server = MessageServiceServer(MyService, True)
-print(dir(server))
 server.start(port=6500) #service starts listening on port 6500
 print("server is running")
 server.join()

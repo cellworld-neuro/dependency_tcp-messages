@@ -149,10 +149,12 @@ class MessageServiceServer(MessageServer):
         client_connection.service_object = self.service_class()
         client_connection.service_object.server = self
 
+    @staticmethod
     def __handler__(message, client_connection):
         method = getattr(client_connection.service_object, message.header)
         if message.body:
-            d = JsonObject.load(message.body).to_dict()
+            o = JsonObject.load(message.body)
+            d = o.to_dict()
             return method(**d)
         else:
             return method()

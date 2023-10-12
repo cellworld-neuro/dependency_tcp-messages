@@ -1,9 +1,21 @@
 from json_cpp import *
 from time import sleep
 from src import MessageClient, Message
+from cellworld import Coordinates, Coordinates_list
 
 client = MessageClient()
 client.connect("127.0.0.1", 6500)
+sleep(2)
+print("method7")
+print(client.send_request("method7", c=Coordinates(10,10)))
+sleep(2)
+cl = Coordinates_list()
+cl.append(Coordinates(1,1))
+cl.append(Coordinates(2,2))
+cl.append(Coordinates(3,3))
+print("method8")
+print(client.send_request("method8", cl=cl))
+
 sleep(2)
 print("method1")
 print(client.send_request("method1", v=10))
