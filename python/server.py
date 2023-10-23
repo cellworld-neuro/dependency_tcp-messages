@@ -46,8 +46,8 @@ class MyService:
 
     @json_force_parameter_type
     def method8(self, cl: Coordinates_list):
-        cl.append(Coordinates(10,10))
-        cl.append(Coordinates(10,10))
+        cl.append(Coordinates(10, 10))
+        cl.append(Coordinates(10, 10))
         return cl
 
 
