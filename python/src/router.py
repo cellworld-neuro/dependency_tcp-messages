@@ -32,14 +32,14 @@ class Router:
     def add_route(self, pattern: str, handler, body_type=None):
         if not callable(handler):
             raise RuntimeError ("incorrect type for handler")
-        if body_type is None:
-            from inspect import signature
-            s = signature(handler)
-            if len(s.parameters) == 0:
-                body_type = Router.Empty
-            elif len(s.parameters) == 1:
+        from inspect import signature
+        s = signature(handler)
+        if len(s.parameters) == 0:
+            body_type = Router.Empty
+        elif body_type is None:
+            if len(s.parameters) == 1:
                 body_type = Router.Message
-            elif len(s.parameters) > 1:
+            else:
                 body_type = Router.Parse
         self.routes[pattern] = (handler, body_type)
 

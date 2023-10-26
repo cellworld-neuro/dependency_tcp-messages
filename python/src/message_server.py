@@ -139,7 +139,9 @@ class MessageServiceServer(MessageServer):
         if not self.sessions_enabled:
             self.service_object = service_class()
             for method in methods:
-                self.router.add_route(method, getattr(self.service_object, method), Router.Parse)
+                cadidate = getattr(self.service_object, method)
+                if type(cadidate) is type(self.join):
+                    self.router.add_route(method, cadidate, Router.Parse)
         else:
             self.on_new_connection = self.__new_session__
             for method in methods:
