@@ -80,3 +80,29 @@ class MessageParts(JsonList):
         if len(self) == 0:
             return False
         return self[0].parts == len(self)
+
+
+class ManifestRouteParameter(JsonObject):
+
+    def __init__(self, parameter_name:str = "", parameter_type = ""):
+        self.parameter_name = parameter_name
+        self.parameter_type = parameter_type
+        JsonObject.__init__(self)
+
+
+class ManifestRoute(JsonObject):
+
+    def __init__(self, pattern: str = "", route_type: str = "", parameters: JsonList = None):
+        self.pattern = pattern
+        self.route_type = route_type
+        if parameters:
+            self.parameters = parameters
+        else:
+            self.parameters = JsonList(list_type=ManifestRouteParameter)
+        JsonObject.__init__(self)
+
+
+class Manifest(JsonList):
+
+    def __init__(self):
+        JsonList.__init__(self, list_type=ManifestRoute)

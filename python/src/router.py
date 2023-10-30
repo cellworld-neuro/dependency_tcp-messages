@@ -1,6 +1,6 @@
 from threading import Thread, Lock
 import types
-from .message import Message
+from .message import Message, Manifest, ManifestRoute, ManifestRouteParameter
 from .message_event import MessageEvent
 from .connection import Connection
 from .util import check_type
@@ -44,14 +44,33 @@ class Router:
         self.routes[pattern] = (handler, body_type)
 
     def get_manifest(self):
-        manifest = JsonList()
+        from inspect import signature, _empty
+        manifest = Manifest()
         for pattern in self.routes.keys():
             (handler, body_type) = self.routes[pattern]
-            if body_type:
-                body_type_str = body_type.__name__
+            route_type = "Empty"
+            manifest_route = ManifestRoute()
+            if body_type == Router.Message:
+                route_type = "Message"
+            elif body_type == Router.Body:
+                route_type = "Body"
+            elif body_type == Router.Parse:
+                route_type = "Parse"
+                parameters = signature(handler).parameters
+                for parameter_name in parameters:
+                    parameter = parameters[parameter_name]
+                    parameter_type = ""
+                    if not parameter.annotation is _empty:
+                        parameter_type = parameter.annotation.__name__
+                    manifest_route.parameters.append(ManifestRouteParameter(parameter.name,
+                                                                            parameter_type))
+            elif body_type == Router.Complete:
+                route_type = "Complete"
             else:
-                body_type_str = ""
-            manifest.append(JsonObject(route=pattern, input_type=body_type_str))
+                if body_type is type:
+                    route_type = "Type(%s)" % body_type.__name__
+            manifest_route.route_type = route_type
+            manifest.append(manifest_route)
         return manifest
 
     def route(self, message: Message, connection: Connection):
