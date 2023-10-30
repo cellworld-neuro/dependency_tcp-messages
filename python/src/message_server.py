@@ -106,7 +106,7 @@ class MessageServer:
                         self.on_new_connection(client_connection)
 
             except socket.timeout:
-                pass# no pending connecttions
+                pass  # no pending connecttions
             except Exception as e:
                 print("Server: socked closed unexpectedly")
                 self.running = False
@@ -139,9 +139,9 @@ class MessageServiceServer(MessageServer):
         if not self.sessions_enabled:
             self.service_object = service_class()
             for method in methods:
-                cadidate = getattr(self.service_object, method)
-                if type(cadidate) is type(self.join):
-                    self.router.add_route(method, cadidate, Router.Parse)
+                candidate = getattr(self.service_object, method)
+                if type(candidate) is type(self.join):
+                    self.router.add_route(method, candidate, Router.Parse)
         else:
             self.on_new_connection = self.__new_session__
             for method in methods:

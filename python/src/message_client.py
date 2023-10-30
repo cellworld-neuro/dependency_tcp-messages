@@ -1,5 +1,5 @@
 import socket
-from .message import Message
+from .message import Message, Manifest
 from .message_event import MessageEvent
 from .message_list import MessageList
 from .connection import Connection
@@ -97,7 +97,7 @@ class MessageClient:
         self.send_message(message)
 
     def get_manifest(self):
-        return self.send_request(Message("!manifest")).get_body(JsonList)
+        return self.send_request(Message("!manifest")).get_body(Manifest)
 
     def subscribe(self):
         return self.send_request(Message("!subscribe")).body == "success"

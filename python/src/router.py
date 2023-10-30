@@ -1,5 +1,8 @@
 from threading import Thread, Lock
 import types
+
+import json_cpp
+
 from .message import Message, Manifest, ManifestRoute, ManifestRouteParameter
 from .message_event import MessageEvent
 from .connection import Connection
@@ -49,21 +52,17 @@ class Router:
         for pattern in self.routes.keys():
             (handler, body_type) = self.routes[pattern]
             route_type = "Empty"
-            manifest_route = ManifestRoute()
+            manifest_route = ManifestRoute(pattern=pattern)
             if body_type == Router.Message:
                 route_type = "Message"
             elif body_type == Router.Body:
                 route_type = "Body"
             elif body_type == Router.Parse:
                 route_type = "Parse"
-                parameters = signature(handler).parameters
-                for parameter_name in parameters:
-                    parameter = parameters[parameter_name]
-                    parameter_type = ""
-                    if not parameter.annotation is _empty:
-                        parameter_type = parameter.annotation.__name__
+                parameters = json_cpp.json_get_parameters(handler)
+                for parameter in parameters:
                     manifest_route.parameters.append(ManifestRouteParameter(parameter.name,
-                                                                            parameter_type))
+                                                                            parameter.type))
             elif body_type == Router.Complete:
                 route_type = "Complete"
             else:
